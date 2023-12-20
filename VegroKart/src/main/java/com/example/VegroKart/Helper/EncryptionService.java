@@ -9,15 +9,17 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class EncryptionService {
 	
-	@Value("${encryptio.salt.rounds}")
+	@Value( "${encryption.salt.rounds}")
 	private int saltRounds;
-	
+
 	private String salt;
 	
+	
 	@PostConstruct
-	public void postConstruct() {
+	public void postConstructer() {
 		salt=BCrypt.gensalt(saltRounds);
 	}
+	
 	
 	public String encryptPassword(String password) {
 		return BCrypt.hashpw(password, salt);
