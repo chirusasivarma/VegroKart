@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.example.VegroKart.Helper.ResponseBody;
 
-@ControllerAdvice
+
 public class ResponseEntityException extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(UserIsNotFoundException.class)
