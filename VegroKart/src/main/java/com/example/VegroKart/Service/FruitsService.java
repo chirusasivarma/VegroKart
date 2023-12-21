@@ -17,6 +17,7 @@ import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
 import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Exception.FruitsIsNotFoundException;
+import com.example.VegroKart.Exception.SnacksIsNotFoundException;
 import com.example.VegroKart.Repository.FruitsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -168,23 +169,23 @@ public class FruitsService {
 	}
 
 	@Transactional
-    public boolean deleteFruits(long id) {
+    public void deleteFruits(long id) {
         Optional<Fruits> optionalFruits = fruitsRepository.findById(id);
 
         if (optionalFruits.isPresent()) {
             fruitsRepository.deleteById(id);
-            return true; 
+           // Deletion successful
         } else {
-            return false; 
+           throw new FruitsIsNotFoundException("Fruits not found with this id " + id); 
         }
     }
 
+}
     
 	
 
 
-}
-		
+
 
 
 

@@ -39,8 +39,19 @@ public class ValidationExceptionHandler {
 		body.setData(exception.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
 	}
+	@ExceptionHandler(SnacksIsNotFoundException.class)
+	public ResponseEntity<ResponseBody<String>> SnacksIsNotFoundException(SnacksIsNotFoundException exception){
+		ResponseBody<String> body = new ResponseBody<String>();
+		body.setStatusCode(HttpStatus.BAD_REQUEST.value());
+		body.setStatus("BAD_REQUEST");
+		body.setData(exception.getMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+	}
 	
-	
-	
-	
+
 }
+
+	
+	
+	
+

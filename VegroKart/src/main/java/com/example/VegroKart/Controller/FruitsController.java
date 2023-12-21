@@ -122,32 +122,13 @@ public class FruitsController {
 	}
 	@DeleteMapping("/deleteById/{id}")
 	public ResponseEntity<ResponseBody<String>> deleteFruitsById(@PathVariable long id) {
+		fruitsService.deleteFruits(id);
 	    ResponseBody<String> responsebody = new ResponseBody<>();
-	    try {
-	        boolean isDeleted = fruitsService.deleteFruits(id);
-	        if (isDeleted) {
 	            responsebody.setStatusCode(HttpStatus.OK.value());
 	            responsebody.setStatus("SUCCESS");
-	            responsebody.setData("fruits with ID " + id + " deleted successfully.");
+	            responsebody.setData("Snacks with ID " + id + " deleted successfully.");
 	            return ResponseEntity.ok(responsebody);
-	        } else {
-	            responsebody.setStatusCode(HttpStatus.NOT_FOUND.value());
-	            responsebody.setStatus("NOT_FOUND");
-	            responsebody.setData("Fruits with ID " + id + " not found.");
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responsebody);
-	        }
-	    } catch (FruitsIsNotFoundException e) {
-	        responsebody.setStatusCode(HttpStatus.NOT_FOUND.value());
-	        responsebody.setStatus("NOT_FOUND");
-	        responsebody.setData("Fruits with ID " + id + " not found.");
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responsebody);
-	    }
+	        } 
 	}
 
 
-
-
-
-
-
-}

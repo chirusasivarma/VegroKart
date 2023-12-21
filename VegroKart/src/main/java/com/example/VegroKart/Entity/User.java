@@ -1,6 +1,7 @@
 package com.example.VegroKart.Entity;
 
 import java.sql.Blob;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -68,5 +69,8 @@ public class User {
 //    @JoinColumn(referencedColumnName = "id" , name = "user-Id")
 //    private List<MyAddress> myAddress;
 //	
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Fruits> fruitsList = new ArrayList<>();
+
 
 }
