@@ -71,6 +71,11 @@ public class UserController {
 	}
 	}
 	
+	 @PostMapping("/verify-otp/{userId}")
+	    public boolean verifyOtp(@PathVariable String userId, @RequestParam String userEnteredOtp) {
+	        return userService.verifyOtp(userId, userEnteredOtp);
+	    }
+	
 	@PostMapping("/login")
 	public ResponseEntity<ResponseBody<?>> userLogin(@Valid @RequestBody Login login){
 		userService.loginUser(login.getMobileNumber(), login.getPassword());

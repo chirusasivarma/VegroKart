@@ -17,18 +17,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Dto.ChangePassword;
 import com.example.VegroKart.Dto.Registration;
-import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
-import com.example.VegroKart.Entity.MyAddress;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.EncryptionService;
 import com.example.VegroKart.Repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class UserService {
 	
 	@Autowired
@@ -36,6 +36,8 @@ public class UserService {
 	
 	@Autowired
 	private EncryptionService encryptionService;
+	
+
 	
 	//save user details
 	public User saveUser(MultipartFile file,String name,String mobileNumber,String myAddress, String emailAddress, String password) throws SerialException, SQLException, IOException {
@@ -74,7 +76,13 @@ public class UserService {
 		user.setEmailAddress(registration.getEmailAddress());
 		user.setMobileNumber(registration.getMobileNumber());
 		user.setPassword(encryptionService.encryptPassword(registration.getPassword()));
-		return userRepository.save(user);
+		// Generate OTP
+	    String otp = OtpService.generateRandomNumericOtp();
+	    user.setOtp(otp);
+	    userRepository.save(user);
+	    OtpService.sendOtpViaSms(user.getMobileNumber(), otp);
+
+	    return user;
 	}
 	
 	// user login
@@ -302,6 +310,24 @@ public class UserService {
 			 throw new UserIsNotFoundException("user not found with id :" + id);
 		}
 	  }
+	  
+	  
+	  
+	  public boolean verifyOtp(String userId, String userEnteredOtp) {
+	        try {
+	            User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
+	            if (user != null) {
+	                String storedOtp = user.getOtp();
+
+	                return OtpService.verifyOtp(userEnteredOtp, storedOtp);
+	            } else {
+	                log.info("User with ID {} not found", userId);
+	            }
+	        } catch (Exception e) {
+	            log.error("Error verifying OTP: {}", e.getMessage());
+	        }
+	        return false;
+	    }
 
 
 }

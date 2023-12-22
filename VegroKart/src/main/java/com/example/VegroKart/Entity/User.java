@@ -61,7 +61,7 @@ public class User {
     @JsonIgnore
     private Blob image;
     
-    @NotBlank(message = "address must not be blank")
+ //   @NotBlank(message = "address must not be blank")
     private String myAddress;
     
 //    
