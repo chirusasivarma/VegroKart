@@ -55,6 +55,8 @@ public class User {
     @NotBlank(message = "Password must not be blank")
     private String password;
     
+    private String otp;
+    
     @Lob
     @JsonIgnore
     private Blob image;

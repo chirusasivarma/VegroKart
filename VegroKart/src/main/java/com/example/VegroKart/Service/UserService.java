@@ -45,7 +45,7 @@ public class UserService {
 		}
 		Optional<User> mobileOptional=userRepository.findByMobileNumber(mobileNumber);
 		if (mobileOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this mobile number .");
+			throw new UserIsNotFoundException("Mobile number is already registered");
 		}
 		User user= new User();
 		byte[] image=file.getBytes();
