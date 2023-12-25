@@ -16,19 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Dto.ChangePassword;
+import com.example.VegroKart.Dto.Login;
+import com.example.VegroKart.Dto.OtpResponseDto;
 import com.example.VegroKart.Dto.Registration;
-import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
-import com.example.VegroKart.Entity.MyAddress;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.EncryptionService;
 import com.example.VegroKart.Repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class UserService {
 	
 	@Autowired
@@ -36,6 +38,11 @@ public class UserService {
 	
 	@Autowired
 	private EncryptionService encryptionService;
+	
+	@Autowired
+	public SmsService smsService;
+	
+
 	
 	//save user details
 	public User saveUser(MultipartFile file,String name,String mobileNumber,String myAddress, String emailAddress, String password) throws SerialException, SQLException, IOException {
@@ -45,7 +52,7 @@ public class UserService {
 		}
 		Optional<User> mobileOptional=userRepository.findByMobileNumber(mobileNumber);
 		if (mobileOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this mobile number .");
+			throw new UserIsNotFoundException("Mobile number is already registered");
 		}
 		User user= new User();
 		byte[] image=file.getBytes();
@@ -60,23 +67,29 @@ public class UserService {
 	}
 	
 	//user registration
-	public User userRegistration(Registration registration) {
-		Optional<User> emailOptional=userRepository.findByEmailAddress(registration.getEmailAddress());
-		if (emailOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this email addres .");
-		}
-		Optional<User> mobileOptional=userRepository.findByMobileNumber(registration.getMobileNumber());
-		if (mobileOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this mobile number .");
-		}
-		User user= new User();
-		user.setName(registration.getName());
-		user.setEmailAddress(registration.getEmailAddress());
-		user.setMobileNumber(registration.getMobileNumber());
-		user.setPassword(encryptionService.encryptPassword(registration.getPassword()));
-		return userRepository.save(user);
-	}
+    public User userRegistration(Registration registration) {
+        
+            Optional<User> emailOptional = userRepository.findByEmailAddress(registration.getEmailAddress());
+            if (emailOptional.isPresent()) {
+                throw new UserIsNotFoundException("User is already existed with this email address.");
+            }
+
+            Optional<User> mobileOptional = userRepository.findByMobileNumber(registration.getMobileNumber());
+            if (mobileOptional.isPresent()) {
+                throw new UserIsNotFoundException("User is already existed with this mobile number.");
+            }
+            smsService.sendRegistrationOtp(registration);
+            User user = new User();
+            user.setName(registration.getName());
+            user.setEmailAddress(registration.getEmailAddress());
+            user.setMobileNumber(registration.getMobileNumber());
+            user.setPassword(encryptionService.encryptPassword(registration.getPassword()));
+            userRepository.save(user);
+            return user;
+       
+    }
 	
+    
 	// user login
 	public User loginUser(String mobileNumber , String password) {
 		Optional<User> userOptional=userRepository.findByMobileNumber(mobileNumber);
@@ -92,6 +105,36 @@ public class UserService {
 		}
 		
 	}
+	
+	
+// user login and otp
+	 public OtpResponseDto loginUserAndSendOtp(Login login) {
+	        Optional<User> userOptional = userRepository.findByMobileNumber(login.getMobileNumber());
+	        
+	        if (userOptional.isPresent()) {
+	            User user = userOptional.get();
+	            if (encryptionService.verifyPassword(login.getPassword(), user.getPassword())) {
+	                // User login successful, now send OTP
+	                return smsService.sendSMS(login);
+	            } else {
+	                throw new UserIsNotFoundException("User password is invalid.");
+	            }
+	        } else {
+	            throw new UserIsNotFoundException("This mobile number is not registered.");
+	        }
+	    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	//user resetPassword
@@ -302,6 +345,24 @@ public class UserService {
 			 throw new UserIsNotFoundException("user not found with id :" + id);
 		}
 	  }
+	  
+	  
+	  
+//	  public boolean verifyOtp(String userId, String userEnteredOtp) {
+//	        try {
+//	            User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
+//	            if (user != null) {
+//	                String storedOtp = user.getOtp();
+//
+//	                return OtpService.verifyOtp(userId, userEnteredOtp);
+//	            } else {
+//	                log.info("User with ID {} not found", userId);
+//	            }
+//	        } catch (Exception e) {
+//	            log.error("Error verifying OTP: {}", e.getMessage());
+//	        }
+//	        return false;
+//	    }
 
 
 }

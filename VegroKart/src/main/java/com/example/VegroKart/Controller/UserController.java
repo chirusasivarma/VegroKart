@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Dto.ChangePassword;
 import com.example.VegroKart.Dto.Login;
+import com.example.VegroKart.Dto.OtpResponseDto;
+import com.example.VegroKart.Dto.OtpStatus;
 import com.example.VegroKart.Dto.Registration;
 import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
@@ -32,16 +34,22 @@ import com.example.VegroKart.Entity.MyAddress;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
+import com.example.VegroKart.Service.SmsService;
 import com.example.VegroKart.Service.UserService;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private SmsService smsService;
 	
 	@PostMapping("/save")
 	public ResponseEntity<ResponseBody<?>> saveUser(@Valid
@@ -71,15 +79,28 @@ public class UserController {
 	}
 	}
 	
+	
+//	@PostMapping("/login")
+//	public ResponseEntity<ResponseBody<?>> userLogin(@Valid @RequestBody Login login){
+//		userService.loginUser(login.getMobileNumber(), login.getPassword());
+//		ResponseBody<String> body=new ResponseBody<String>();
+//		body.setStatusCode(HttpStatus.OK.value());
+//		body.setStatus("SUCCESS");
+//		body.setData("User Login Successfull");
+//		return ResponseEntity.ok(body);
+//	}
+	
 	@PostMapping("/login")
-	public ResponseEntity<ResponseBody<?>> userLogin(@Valid @RequestBody Login login){
-		userService.loginUser(login.getMobileNumber(), login.getPassword());
+	public ResponseEntity<ResponseBody<?>> userLogins(@Valid @RequestBody Login login){
+		userService.loginUserAndSendOtp(login);
 		ResponseBody<String> body=new ResponseBody<String>();
 		body.setStatusCode(HttpStatus.OK.value());
 		body.setStatus("SUCCESS");
 		body.setData("User Login Successfull");
 		return ResponseEntity.ok(body);
 	}
+	
+
 	
 	 @PatchMapping("/resetpassword")
 	 public ResponseEntity<ResponseBody<?>> resetPassword(@Valid @RequestBody ResetPassword resetPassword) {
@@ -186,5 +207,16 @@ public class UserController {
 			 return ResponseEntity.status(HttpStatus.OK).body(body);
 		 }
 	 
-	 
+		  @PostMapping("/validate-otp/{mobileNumber}")
+		    public ResponseEntity<String> validateOtp(
+		            @PathVariable String mobileNumber,
+		            @RequestParam String otpNumber) {
+		        try {
+		            String validationMessage = smsService.validateOtp(mobileNumber, otpNumber);
+		            return ResponseEntity.ok(validationMessage);
+		        } catch (Exception e) {
+		            log.error("Error validating OTP: {}", e.getMessage());
+		            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
+		        }
+		    }
 }
