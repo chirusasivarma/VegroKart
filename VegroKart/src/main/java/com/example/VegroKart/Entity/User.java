@@ -33,6 +33,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "User")
+
 public class User {
 	
 	@Id
@@ -56,12 +57,12 @@ public class User {
     @NotBlank(message = "Password must not be blank")
     private String password;
     
-    @Lob
-    @JsonIgnore
-    private Blob image;
-    
-    @NotBlank(message = "address must not be blank")
-    private String myAddress;
+//    @Lob
+//    @JsonIgnore
+//    private Blob image;
+//    
+//    @NotBlank(message = "address must not be blank")
+//    private String myAddress;
     
 //    
 //    
@@ -69,6 +70,7 @@ public class User {
 //    @JoinColumn(referencedColumnName = "id" , name = "user-Id")
 //    private List<MyAddress> myAddress;
 //	
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Fruits> fruitsList = new ArrayList<>();
 

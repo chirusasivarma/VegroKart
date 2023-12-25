@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
-import com.example.VegroKart.Exception.FruitsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.FruitsService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +33,6 @@ public class FruitsController {
 	@Autowired
 	public FruitsService fruitsService;
 
-	
 	@PostMapping("/save")
 	public ResponseEntity<ResponseBody<Fruits>> saveFruits(
 			@RequestParam("file") MultipartFile file, @RequestParam("fruitName") String fruitName,

@@ -15,9 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
-import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Exception.FruitsIsNotFoundException;
-import com.example.VegroKart.Exception.SnacksIsNotFoundException;
 import com.example.VegroKart.Repository.FruitsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
