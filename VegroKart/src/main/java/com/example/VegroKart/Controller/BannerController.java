@@ -9,8 +9,11 @@ import javax.sql.rowset.serial.SerialException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,8 +46,41 @@ public class BannerController {
         return ResponseEntity.ok(bannerbody);   
         
     }
+
     
-   
+    @GetMapping("/get-all-banners")
+    public ResponseEntity<ResponseBody<List<Banner>>> getAllBannersData() {
+        List<Banner> banners = bannerService.getAllBanners();
+        ResponseBody<List<Banner>> bannerbody = new ResponseBody<>();
+        bannerbody.setStatusCode(HttpStatus.OK.value());
+        bannerbody.setStatus("SUCCESS");
+        bannerbody.setData(banners);
+        return ResponseEntity.ok(bannerbody); 
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ResponseBody<Banner>> updateBannerById(@PathVariable Long id,
+            @RequestParam("banner1") MultipartFile banner1, @RequestParam("banner2") MultipartFile banner2,
+            @RequestParam("banner3") MultipartFile banner3, @RequestParam("banner4") MultipartFile banner4,
+            @RequestParam("banner5") MultipartFile banner5) throws IOException, SQLException {
+        Banner updatedBanner = bannerService.updateBannerById(id, banner1, banner2, banner3, banner4, banner5);
+        ResponseBody<Banner> bannerbody = new ResponseBody<>();
+        bannerbody.setStatusCode(HttpStatus.OK.value());
+        bannerbody.setStatus("SUCCESS");
+        bannerbody.setData(updatedBanner);
+        return ResponseEntity.ok(bannerbody); 
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseBody<String>> deleteBannerById(@PathVariable Long id) {
+        bannerService.deleteBannerById(id);
+        ResponseBody<String> bannerbody = new ResponseBody<>();
+        bannerbody.setStatusCode(HttpStatus.OK.value());
+        bannerbody.setStatus("SUCCESS");
+        bannerbody.setData("Banner with id " + id + " deleted successfully");
+        return ResponseEntity.ok(bannerbody); 
+        
+    }
 
 
 }
