@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Banner;
 import com.example.VegroKart.Entity.BannerResponse;
+import com.example.VegroKart.Exception.BannerNotFoundException;
 import com.example.VegroKart.Repository.BannerRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,7 +95,44 @@ public class BannerService {
 	public List<Banner> getAllBanners() {
 		return bannerRepository.findAll();
 	}
+	
+	
+	  public Banner updateBannerById(Long id, MultipartFile banner1, MultipartFile banner2,
+	            MultipartFile banner3, MultipartFile banner4, MultipartFile banner5)
+	            throws IOException, SerialException, SQLException {
+	        Banner existingBanner = bannerRepository.findById(id)
+	                .orElseThrow(() -> new BannerNotFoundException("Banner not found with id: " + id));
+	        byte[] bytes1 = banner1.getBytes();
+	        byte[] bytes2 = banner2.getBytes();
+	        byte[] bytes3 = banner3.getBytes();
+	        byte[] bytes4 = banner4.getBytes();
+	        byte[] bytes5 = banner5.getBytes();
 
-	}
+	        SerialBlob blob1 = new javax.sql.rowset.serial.SerialBlob(bytes1);
+	        SerialBlob blob2 = new javax.sql.rowset.serial.SerialBlob(bytes2);
+	        SerialBlob blob3 = new javax.sql.rowset.serial.SerialBlob(bytes3);
+	        SerialBlob blob4 = new javax.sql.rowset.serial.SerialBlob(bytes4);
+	        SerialBlob blob5 = new javax.sql.rowset.serial.SerialBlob(bytes5);
+
+	        existingBanner.setBanner1(blob1);
+	        existingBanner.setBanner2(blob2);
+	        existingBanner.setBanner3(blob3);
+	        existingBanner.setBanner4(blob4);
+	        existingBanner.setBanner5(blob5);
+
+	        return bannerRepository.save(existingBanner);
+	    }
+
+	    public void deleteBannerById(Long id) {
+	      Optional<Banner> bannerOptional=  bannerRepository.findById(id);
+	      if (bannerOptional.isPresent()) {
+	    	  bannerRepository.deleteById(id);
+		}else {
+			throw new BannerNotFoundException("banner not found");
+		}
+	    }
+	
+	
+}
 		
 	
