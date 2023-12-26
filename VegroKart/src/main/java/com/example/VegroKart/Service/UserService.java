@@ -98,40 +98,40 @@ public class UserService {
     }
 	
     
-	// user login
-	public User loginUser(String mobileNumber , String password) {
-		Optional<User> userOptional=userRepository.findByMobileNumber(mobileNumber);
-		if (userOptional.isPresent()) {
-			User user=userOptional.get();
-			if (encryptionService.verifyPassword(password, user.getPassword())) {
-				return user;
-			}else {
-				throw new UserIsNotFoundException("user password invalide.");
-			}
-		}else {
-			throw new UserIsNotFoundException("this mobile number is not registred.");
-		}
-		
-	}
-	
-	
-// user login and otp
-	 public OtpResponseDto loginUserAndSendOtp(Login login) {
-	        Optional<User> userOptional = userRepository.findByMobileNumber(login.getMobileNumber());
-	        
-	        if (userOptional.isPresent()) {
-	            User user = userOptional.get();
-	            if (encryptionService.verifyPassword(login.getPassword(), user.getPassword())) {
-	                // User login successful, now send OTP
-	                return smsService.sendSMS(login);
-	            } else {
-	                throw new UserIsNotFoundException("User password is invalid.");
-	            }
-	        } else {
-	            throw new UserIsNotFoundException("This mobile number is not registered.");
-	        }
-	    }
-	 
+//	// user login
+//	public User loginUser(String mobileNumber , String password) {
+//		Optional<User> userOptional=userRepository.findByMobileNumber(mobileNumber);
+//		if (userOptional.isPresent()) {
+//			User user=userOptional.get();
+//			if (encryptionService.verifyPassword(password, user.getPassword())) {
+//				return user;
+//			}else {
+//				throw new UserIsNotFoundException("user password invalide.");
+//			}
+//		}else {
+//			throw new UserIsNotFoundException("this mobile number is not registred.");
+//		}
+//		
+//	}
+//	
+//	
+//// user login and otp
+//	 public OtpResponseDto loginUserAndSendOtp(Login login) {
+//	        Optional<User> userOptional = userRepository.findByMobileNumber(login.getMobileNumber());
+//	        
+//	        if (userOptional.isPresent()) {
+//	            User user = userOptional.get();
+//	            if (encryptionService.verifyPassword(login.getPassword(), user.getPassword())) {
+//	                // User login successful, now send OTP
+//	                return smsService.sendSMS(login);
+//	            } else {
+//	                throw new UserIsNotFoundException("User password is invalid.");
+//	            }
+//	        } else {
+//	            throw new UserIsNotFoundException("This mobile number is not registered.");
+//	        }
+//	    }
+//	 
 	 
 
 	 public Object authenticateUser(Login login) {
