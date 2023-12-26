@@ -12,11 +12,11 @@ import lombok.ToString;
 @ToString
 public class Login {
 	
-    @NotNull(message = "Mobile number must not be null")
-    @Pattern(regexp = "\\d{10}", message = "Please provide a valid 10-digit mobile number")
+
     private String mobileNumber;
 
-    @NotBlank(message = "Password must not be blank")
     private String password;
+    
+   
 
 }

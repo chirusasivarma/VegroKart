@@ -16,19 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Dto.ChangePassword;
+import com.example.VegroKart.Dto.Login;
+import com.example.VegroKart.Dto.OtpResponseDto;
 import com.example.VegroKart.Dto.Registration;
-import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
-import com.example.VegroKart.Entity.MyAddress;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.EncryptionService;
 import com.example.VegroKart.Repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class UserService {
 	
 	@Autowired
@@ -36,6 +38,11 @@ public class UserService {
 	
 	@Autowired
 	private EncryptionService encryptionService;
+	
+	@Autowired
+	public SmsService smsService;
+	
+
 	
 	//save user details
 	public User saveUser(MultipartFile file,String name,String mobileNumber,String myAddress, String emailAddress, String password) throws SerialException, SQLException, IOException {
@@ -45,38 +52,44 @@ public class UserService {
 		}
 		Optional<User> mobileOptional=userRepository.findByMobileNumber(mobileNumber);
 		if (mobileOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this mobile number .");
+			throw new UserIsNotFoundException("Mobile number is already registered");
 		}
 		User user= new User();
 		byte[] image=file.getBytes();
 		Blob blob= new SerialBlob(image);
-		//user.setImage(blob);
+		user.setImage(blob);
 		user.setName(name);
 		user.setEmailAddress(emailAddress);
 		user.setMobileNumber(mobileNumber);
-		//user.setMyAddress(myAddress);
+		user.setMyAddress(myAddress);
 		user.setPassword(encryptionService.encryptPassword(password));
 		return userRepository.save(user);
 	}
 	
 	//user registration
-	public User userRegistration(Registration registration) {
-		Optional<User> emailOptional=userRepository.findByEmailAddress(registration.getEmailAddress());
-		if (emailOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this email addres .");
-		}
-		Optional<User> mobileOptional=userRepository.findByMobileNumber(registration.getMobileNumber());
-		if (mobileOptional.isPresent()) {
-			throw new UserIsNotFoundException("user is already existed with this mobile number .");
-		}
-		User user= new User();
-		user.setName(registration.getName());
-		user.setEmailAddress(registration.getEmailAddress());
-		user.setMobileNumber(registration.getMobileNumber());
-		user.setPassword(encryptionService.encryptPassword(registration.getPassword()));
-		return userRepository.save(user);
-	}
+    public User userRegistration(Registration registration) {
+        
+            Optional<User> emailOptional = userRepository.findByEmailAddress(registration.getEmailAddress());
+            if (emailOptional.isPresent()) {
+                throw new UserIsNotFoundException("User is already existed with this email address.");
+            }
+
+            Optional<User> mobileOptional = userRepository.findByMobileNumber(registration.getMobileNumber());
+            if (mobileOptional.isPresent()) {
+                throw new UserIsNotFoundException("User is already existed with this mobile number.");
+            }
+            smsService.sendRegistrationOtp(registration);
+            User user = new User();
+            user.setName(registration.getName());
+            user.setEmailAddress(registration.getEmailAddress());
+            user.setMobileNumber(registration.getMobileNumber());
+            user.setPassword(encryptionService.encryptPassword(registration.getPassword()));
+            userRepository.save(user);
+            return user;
+       
+    }
 	
+    
 	// user login
 	public User loginUser(String mobileNumber , String password) {
 		Optional<User> userOptional=userRepository.findByMobileNumber(mobileNumber);
@@ -92,6 +105,36 @@ public class UserService {
 		}
 		
 	}
+	
+	
+// user login and otp
+	 public OtpResponseDto loginUserAndSendOtp(Login login) {
+	        Optional<User> userOptional = userRepository.findByMobileNumber(login.getMobileNumber());
+	        
+	        if (userOptional.isPresent()) {
+	            User user = userOptional.get();
+	            if (encryptionService.verifyPassword(login.getPassword(), user.getPassword())) {
+	                // User login successful, now send OTP
+	                return smsService.sendSMS(login);
+	            } else {
+	                throw new UserIsNotFoundException("User password is invalid.");
+	            }
+	        } else {
+	            throw new UserIsNotFoundException("This mobile number is not registered.");
+	        }
+	    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	//user resetPassword
@@ -177,131 +220,149 @@ public class UserService {
 	 
 	 
 	 // getall user details
-//	 @Transactional
-//	 public List<UserDto> getAllUsers() {
-//		    List<User> users = userRepository.findAll();
-//		    List<UserDto> userDtos = new ArrayList<>();
+	 @Transactional
+	 public List<UserDto> getAllUsers() {
+		    List<User> users = userRepository.findAll();
+		    List<UserDto> userDtos = new ArrayList<>();
+
+		    users.forEach(user -> {
+		        UserDto userDto = new UserDto();
+		        userDto.setId(user.getId());
+		        userDto.setName(user.getName());
+		        userDto.setEmailAddress(user.getEmailAddress());
+		        userDto.setMobileNumber(user.getMobileNumber());
+		        userDto.setMyAddress(user.getMyAddress());
+		        userDto.setPassword(user.getPassword());
+		        if (user.getImage() != null) {
+		            try {
+		                Blob imageBlob = user.getImage();
+		                if (imageBlob != null) {
+		                    byte[] image = imageBlob.getBytes(1, (int) imageBlob.length());
+		                    userDto.setImage(Base64.getEncoder().encodeToString(image));
+		                } else {
+		                    userDto.setImage(null);
+		                }
+		            } catch (SQLException e) {
+		                e.printStackTrace();
+		            }
+		        } else {
+		            userDto.setImage(null);
+		        }
+		        String imageUrl = "/user/getall/image?id=" + user.getId();
+		        userDto.setImage(imageUrl);
+
+		        userDtos.add(userDto);
+		    });
+
+		    return userDtos;
+		}
+
+	 
+	 
+	 //get user by id
+	 @Transactional
+	 public UserDto getUserById(long id) throws SQLException {
+		 Optional<User> userOptional=userRepository.findById(id);
+		 if (userOptional.isEmpty()) {
+			throw new UserIsNotFoundException("user not found with this id :" + id);
+		}
+		 User user=userOptional.get();
+		 UserDto userDto=new UserDto();
+		 userDto.setId(user.getId());
+		userDto.setName(user.getName());
+		userDto.setEmailAddress(user.getEmailAddress());
+		userDto.setMobileNumber(user.getMobileNumber());
+		userDto.setMyAddress(user.getMyAddress());
+		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
+		  if (user.getImage() != null) {
+	            try {
+	                Blob imageBlob = user.getImage();
+	                if (imageBlob != null) {
+	                    byte[] image = imageBlob.getBytes(1, (int) imageBlob.length());
+	                    userDto.setImage(Base64.getEncoder().encodeToString(image));
+	                } else {
+	                    userDto.setImage(null);
+	                }
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        } else {
+	            userDto.setImage(null);
+	        }
+	        String imageUrl = "/user/getall/image?id=" + user.getId();
+	        userDto.setImage(imageUrl);
+		return userDto;
+	 }
+	 
+	  @Transactional
+	    public User updateUser(long id, String name, String emailAddress, String mobileNumber, String password,
+	            MultipartFile file, String myAddress) throws IOException, SerialException, SQLException {
+	        Optional<User> optionalExistingUser = userRepository.findById(id);
+
+	        if (optionalExistingUser.isEmpty()) {
+	            throw new UserIsNotFoundException("user not found with id :" + id);
+	        }
+
+	        User existingUser = optionalExistingUser.get();
+	        existingUser.setName(name);
+	        existingUser.setEmailAddress(emailAddress);
+	        existingUser.setMobileNumber(mobileNumber);
+	        existingUser.setPassword(password);
+	        existingUser.setMyAddress(myAddress);
+
+	        if (file != null && !file.isEmpty()) {
+	            byte[] bytes = file.getBytes();
+	            Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
+	            existingUser.setImage(blob);
+	        }
+
+	        userRepository.save(existingUser);
+
+	        return existingUser;
+	    }
+
+	 
+	  public byte[] getImageById(long id) {
+	        Optional<User> optionalUser = userRepository.findById(id);
+	        if (optionalUser.isPresent()) {
+	            User user = optionalUser.get();
+	            try {
+	                if (user.getImage() != null) {
+	                    return user.getImage().getBytes(1, (int) user.getImage().length());
+	                }
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	        return null;
+	    }
+	  
+	  public void deleteUserById(long id) {
+		  Optional<User> userOptional=userRepository.findById(id);
+		  if (userOptional.isPresent()) {
+			   userRepository.deleteById(id);
+		}else {
+			 throw new UserIsNotFoundException("user not found with id :" + id);
+		}
+	  }
+	  
+	  
+	  
+//	  public boolean verifyOtp(String userId, String userEnteredOtp) {
+//	        try {
+//	            User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
+//	            if (user != null) {
+//	                String storedOtp = user.getOtp();
 //
-//		    users.forEach(user -> {
-//		        UserDto userDto = new UserDto();
-//		        userDto.setId(user.getId());
-//		        userDto.setName(user.getName());
-//		        userDto.setEmailAddress(user.getEmailAddress());
-//		        userDto.setMobileNumber(user.getMobileNumber());
-//		        userDto.setMyAddress(user.getMyAddress());
-//		        userDto.setPassword(user.getPassword());
-//		        if (user.getImage() != null) {
-//		            try {
-//		                Blob imageBlob = user.getImage();
-//		                if (imageBlob != null) {
-//		                    byte[] image = imageBlob.getBytes(1, (int) imageBlob.length());
-//		                    userDto.setImage(Base64.getEncoder().encodeToString(image));
-//		                } else {
-//		                    userDto.setImage(null);
-//		                }
-//		            } catch (SQLException e) {
-//		                e.printStackTrace();
-//		            }
-//		        } else {
-//		            userDto.setImage(null);
-//		        }
-//		        String imageUrl = "/user/getall/image?id=" + user.getId();
-//		        userDto.setImage(imageUrl);
-//
-//		        userDtos.add(userDto);
-//		    });
-//
-//		    return userDtos;
-//		}
-//
-//	 
-//	 
-//	 //get user by id
-//	 @Transactional
-//	 public UserDto getUserById(long id) throws SQLException {
-//		 Optional<User> userOptional=userRepository.findById(id);
-//		 if (userOptional.isEmpty()) {
-//			throw new UserIsNotFoundException("user not found with this id :" + id);
-//		}
-//		 User user=userOptional.get();
-//		 UserDto userDto=new UserDto();
-//		 userDto.setId(user.getId());
-//		userDto.setName(user.getName());
-//		userDto.setEmailAddress(user.getEmailAddress());
-//		userDto.setMobileNumber(user.getMobileNumber());
-//		userDto.setMyAddress(user.getMyAddress());
-//		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
-//		  if (user.getImage() != null) {
-//	            try {
-//	                Blob imageBlob = user.getImage();
-//	                if (imageBlob != null) {
-//	                    byte[] image = imageBlob.getBytes(1, (int) imageBlob.length());
-//	                    userDto.setImage(Base64.getEncoder().encodeToString(image));
-//	                } else {
-//	                    userDto.setImage(null);
-//	                }
-//	            } catch (SQLException e) {
-//	                e.printStackTrace();
+//	                return OtpService.verifyOtp(userId, userEnteredOtp);
+//	            } else {
+//	                log.info("User with ID {} not found", userId);
 //	            }
-//	        } else {
-//	            userDto.setImage(null);
+//	        } catch (Exception e) {
+//	            log.error("Error verifying OTP: {}", e.getMessage());
 //	        }
-//	        String imageUrl = "/user/getall/image?id=" + user.getId();
-//	        userDto.setImage(imageUrl);
-//		return userDto;
-//	 }
-//	 
-//	  @Transactional
-//	    public User updateUser(long id, String name, String emailAddress, String mobileNumber, String password,
-//	            MultipartFile file, String myAddress) throws IOException, SerialException, SQLException {
-//	        Optional<User> optionalExistingUser = userRepository.findById(id);
-//
-//	        if (optionalExistingUser.isEmpty()) {
-//	            throw new UserIsNotFoundException("user not found with id :" + id);
-//	        }
-//
-//	        User existingUser = optionalExistingUser.get();
-//	        existingUser.setName(name);
-//	        existingUser.setEmailAddress(emailAddress);
-//	        existingUser.setMobileNumber(mobileNumber);
-//	        existingUser.setPassword(password);
-//	        existingUser.setMyAddress(myAddress);
-//
-//	        if (file != null && !file.isEmpty()) {
-//	            byte[] bytes = file.getBytes();
-//	            Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
-//	            existingUser.setImage(blob);
-//	        }
-//
-//	        userRepository.save(existingUser);
-//
-//	        return existingUser;
+//	        return false;
 //	    }
-//
-//	 
-//	  public byte[] getImageById(long id) {
-//	        Optional<User> optionalUser = userRepository.findById(id);
-//	        if (optionalUser.isPresent()) {
-//	            User user = optionalUser.get();
-//	            try {
-//	                if (user.getImage() != null) {
-//	                    return user.getImage().getBytes(1, (int) user.getImage().length());
-//	                }
-//	            } catch (SQLException e) {
-//	                e.printStackTrace();
-//	            }
-//	        }
-//	        return null;
-//	    }
-//	  
-//	  public void deleteUserById(long id) {
-//		  Optional<User> userOptional=userRepository.findById(id);
-//		  if (userOptional.isPresent()) {
-//			   userRepository.deleteById(id);
-//		}else {
-//			 throw new UserIsNotFoundException("user not found with id :" + id);
-//		}
-	 // }
 
 
 }
