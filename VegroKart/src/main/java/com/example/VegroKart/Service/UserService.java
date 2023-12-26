@@ -16,14 +16,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Dto.ChangePassword;
+import com.example.VegroKart.Dto.CombinedAuthResponse;
 import com.example.VegroKart.Dto.Login;
+import com.example.VegroKart.Dto.LoginDto;
 import com.example.VegroKart.Dto.OtpResponseDto;
 import com.example.VegroKart.Dto.Registration;
+import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.EncryptionService;
 import com.example.VegroKart.Repository.UserRepository;
+import com.example.VegroKart.SecurityConfiguration.JwtService;
+import com.example.VegroKart.SecurityConfiguration.LocalUserService;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +46,9 @@ public class UserService {
 	
 	@Autowired
 	public SmsService smsService;
+	
+	@Autowired
+	private JwtService jwtService;
 	
 
 	
@@ -123,49 +131,74 @@ public class UserService {
 	            throw new UserIsNotFoundException("This mobile number is not registered.");
 	        }
 	    }
+	 
+	 
+
+	 public Object authenticateUser(Login login) {
+	        Optional<User> userOptional = userRepository.findByMobileNumber(login.getMobileNumber());
+
+	        if (userOptional.isPresent()) {
+	            User user = userOptional.get();
+	            if (encryptionService.verifyPassword(login.getPassword(), user.getPassword())) {
+	                // User login successful
+
+	                // Generate JWT token
+	                LocalUserService userDetails = new LocalUserService(user);
+	                String jwt = jwtService.generateToken(userDetails);
+	                // Send OTP
+	                OtpResponseDto otpResponse = smsService.sendSMS(login);
+	                CombinedAuthResponse combinedResponse = new CombinedAuthResponse();
+	                combinedResponse.setJwtToken(jwt);
+	                combinedResponse.setOtpResponse(otpResponse);
+
+	                return combinedResponse;
+	            } else {
+	                throw new UserIsNotFoundException("Invalid password");
+	            }
+	        } else {
+	            throw new UserIsNotFoundException("This mobile number is not registered.");
+	        }
+	    }
+
+
+
+	 
+	 
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//user resetPassword
-	 public User resetPassword(String mobileNumber, String confirmPassword) {
+	//user resetPassword By mobile number
+		 public User resetPasswordById(long userId, ResetPassword resetPassword) {
+		        Optional<User> optionalUser = userRepository.findById(userId);
+		        if (optionalUser.isPresent()) {
+		            User user = optionalUser.get();
+
+		            if (!resetPassword.getPassword().equals(resetPassword.getConfirmPassword())) {
+		                throw new UserIsNotFoundException("Password and confirm password do not match");
+		            }
+
+		            user.setPassword(encryptionService.encryptPassword(resetPassword.getPassword()));
+		            return userRepository.save(user);
+		        } else {
+		            throw new UserIsNotFoundException("User not found for user Id: " + userId);
+		        }
+		    }
+	 
+	//user resetPassword By userId
+	 public User resetPassword(String mobileNumber, ResetPassword resetPassword) {
 	        Optional<User> optionalUser = userRepository.findByMobileNumber(mobileNumber);
 	        if (optionalUser.isPresent()) {
 	            User user = optionalUser.get();
-	            user.setPassword(encryptionService.encryptPassword(confirmPassword));
+
+	            if (!resetPassword.getPassword().equals(resetPassword.getConfirmPassword())) {
+	                throw new UserIsNotFoundException("Password and confirm password do not match");
+	            }
+
+	            user.setPassword(encryptionService.encryptPassword(resetPassword.getPassword()));
 	            return userRepository.save(user);
 	        } else {
 	            throw new UserIsNotFoundException("User not found for mobile number: " + mobileNumber);
 	        }
 	    }
-
-	
-	
-//	 public User resetPassword( ResetPassword resetPassword) {
-//	        Optional<User> optionalUser = userRepository.findByMobileNumber(resetPassword.getMobileNumber());
-//	        if (optionalUser.isPresent()) {
-//	            User user = optionalUser.get();
-//
-//	            if (resetPassword.getConfirmPassword().equals(resetPassword.getPassword())) {
-//	                user.setPassword(encryptionService.encryptPassword(resetPassword.getConfirmPassword()));
-//	                return userRepository.save(user);
-//	            } else {
-//	                throw new UserIsNotFoundException("Confirm password does not match new password");
-//	            }
-//	        } else {
-//	            throw new UserIsNotFoundException("User not found for mobile number: " + resetPassword.getMobileNumber());
-//	        }
-//	    }
 	 
 	 
 	 
