@@ -80,9 +80,11 @@ public class UserController {
 	}
 	
 	
+
+//	
 //	@PostMapping("/login")
-//	public ResponseEntity<ResponseBody<?>> userLogin(@Valid @RequestBody Login login){
-//		userService.loginUser(login.getMobileNumber(), login.getPassword());
+//	public ResponseEntity<ResponseBody<?>> userLogins(@Valid @RequestBody Login login){
+//		userService.loginUserAndSendOtp(login);
 //		ResponseBody<String> body=new ResponseBody<String>();
 //		body.setStatusCode(HttpStatus.OK.value());
 //		body.setStatus("SUCCESS");
@@ -90,43 +92,39 @@ public class UserController {
 //		return ResponseEntity.ok(body);
 //	}
 	
-	@PostMapping("/login")
-	public ResponseEntity<ResponseBody<?>> userLogins(@Valid @RequestBody Login login){
-		userService.loginUserAndSendOtp(login);
-		ResponseBody<String> body=new ResponseBody<String>();
-		body.setStatusCode(HttpStatus.OK.value());
-		body.setStatus("SUCCESS");
-		body.setData("User Login Successfull");
-		return ResponseEntity.ok(body);
-	}
-	
 
-	
-	 @PatchMapping("/resetpassword")
-	 public ResponseEntity<ResponseBody<?>> resetPassword(@Valid @RequestBody ResetPassword resetPassword) {
-	        if (resetPassword.getPassword().equals(resetPassword.getConfirmPassword())) {
-	             userService.resetPassword(resetPassword.getMobileNumber(), resetPassword.getConfirmPassword());
-	            ResponseBody<String> body = new ResponseBody<>();
-	            body.setStatusCode(HttpStatus.OK.value());
-	            body.setStatus("SUCCESS");
-	            body.setData("Password reset successfully!");
-	            return ResponseEntity.status(HttpStatus.OK).body(body);
-	        } else {
-	            throw new UserIsNotFoundException("Confirm password does not match new password");
-	        }
-	    }
-	 
-//	 @PatchMapping("/resetpassword/{mobileNumber}")
-//	    public ResponseEntity<ResponseBody<User>> resetPassword(
-//	            @PathVariable String mobileNumber,
-//	            @Valid @RequestBody ResetPassword resetPassword) {
-//	        User user = userService.resetPassword(resetPassword);
-//	        ResponseBody<User> body = new ResponseBody<>();
-//	        body.setStatusCode(HttpStatus.OK.value());
-//	        body.setStatus("SUCCESS");
-//	        body.setData(user);
-//	        return ResponseEntity.status(HttpStatus.OK).body(body);
-//	    }
+	  @PostMapping("/login")
+	    public Object authenticateUser(@RequestBody Login login) {
+	        Object user=userService.authenticateUser(login);
+	            ResponseBody<Object> body=new ResponseBody<>();
+	    		body.setStatusCode(HttpStatus.OK.value());
+	    		body.setStatus("SUCCESS");
+	    		body.setData(user);
+	    		return ResponseEntity.ok(body);
+	    	}
+
+
+	     @PatchMapping("/resetpasswords/{mobileNumber}")
+	     public ResponseEntity<ResponseBody<?>> resetPassword( @PathVariable("mobileNumber") String mobileNumber,
+	             @Valid @RequestBody ResetPassword resetPassword) {
+	         userService.resetPassword(mobileNumber, resetPassword);
+	         ResponseBody<String> body = new ResponseBody<>();
+	         body.setStatusCode(HttpStatus.OK.value());
+	         body.setStatus("SUCCESS");
+	         body.setData("Password reset successfully!");
+	         return ResponseEntity.status(HttpStatus.OK).body(body);
+	     }
+	     @PatchMapping("/resetpasswords/{userId}")
+	     public ResponseEntity<ResponseBody<?>> resetPasswordById( @PathVariable("userId") long userId,
+	             @Valid @RequestBody ResetPassword resetPassword) {
+	         userService.resetPasswordById(userId, resetPassword);
+	         ResponseBody<String> body = new ResponseBody<>();
+	         body.setStatusCode(HttpStatus.OK.value());
+	         body.setStatus("SUCCESS");
+	         body.setData("Password reset successfully!");
+	         return ResponseEntity.status(HttpStatus.OK).body(body);
+	     }
+
 
 
 	 @PatchMapping("/changepassword/{mobileNumber}")
