@@ -2,7 +2,6 @@ package com.example.VegroKart.Entity;
 
 import java.sql.Blob;
 
-import com.example.VegroKart.Home.InstantDelivery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -29,7 +28,7 @@ public class Fruits {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
-	@NotBlank(message = "Fruit name cannot be blank")
+	
 	private String fruitName;
 	
 	private int quantity;

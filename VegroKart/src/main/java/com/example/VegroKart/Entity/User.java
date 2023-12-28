@@ -71,9 +71,5 @@ public class User {
     private List<InstantDelivery> instantDelivery ;
     
     
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Fruits> fruitsList = new ArrayList<>();
-
 
 }
