@@ -10,12 +10,15 @@ import java.util.Optional;
 import javax.sql.rowset.serial.SerialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
+import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Exception.FruitsIsNotFoundException;
+import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Repository.FruitsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -44,34 +47,28 @@ public class FruitsService {
 
 	@Transactional
 	public List<FruitsResponse> getAllFruits() {
-		List<Fruits> fruits = fruitsRepository.findAll();
+	    List<Fruits> fruits = fruitsRepository.findAll(Sort.by(Sort.Order.asc("id")));
 
-		List<FruitsResponse> fruitsResponses = new ArrayList<>();
+	    List<FruitsResponse> fruitsResponses = new ArrayList<>();
 
-		fruits.forEach(e -> {
-
-				FruitsResponse fruitsResponse = new FruitsResponse();
-				fruitsResponse.setId(e.getId());
-				fruitsResponse.setFruitName(e.getFruitName());
-				fruitsResponse.setQuantity(e.getQuantity());
-				fruitsResponse.setPrice(e.getPrice());
-				
-				try {
-
-					byte[] imageBytes = e.getImage().getBytes(1, (int) e.getImage().length());
-					
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				String customImageUrl = "/fruits/displayImage?id=" + e.getId(); // Custom URL
-
-				fruitsResponse.setImage(customImageUrl);
-				fruitsResponses.add(fruitsResponse);
-			
-		});
-		return fruitsResponses;
-
+	    fruits.forEach(e -> {
+	        FruitsResponse fruitsResponse = new FruitsResponse();
+	        fruitsResponse.setId(e.getId());
+	        fruitsResponse.setFruitName(e.getFruitName());
+	        fruitsResponse.setQuantity(e.getQuantity());
+	        fruitsResponse.setPrice(e.getPrice());
+	        
+	        try {
+	            byte[] imageBytes = e.getImage().getBytes(1, (int) e.getImage().length());
+	            
+	        } catch (SQLException e1) {
+	            e1.printStackTrace();
+	        }
+	        String customImageUrl = "/fruits/displayImage?id=" + e.getId();
+	        fruitsResponse.setImage(customImageUrl);
+	        fruitsResponses.add(fruitsResponse);
+	    });
+	    return fruitsResponses;
 	}
 
 	@Transactional
@@ -174,22 +171,7 @@ public class FruitsService {
             fruitsRepository.deleteById(id);
            // Deletion successful
         } else {
-           throw new FruitsIsNotFoundException("Fruits not found with this id " + id); 
+           throw new ProductsIsNotFoundException("Fruits not found with this id " + id); 
         }
     }
-
 }
-    
-	
-
-
-
-
-
-
-
-
-
-
-
-		

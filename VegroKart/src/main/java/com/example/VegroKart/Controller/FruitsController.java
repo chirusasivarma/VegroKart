@@ -124,7 +124,7 @@ public class FruitsController {
 	    ResponseBody<String> responsebody = new ResponseBody<>();
 	            responsebody.setStatusCode(HttpStatus.OK.value());
 	            responsebody.setStatus("SUCCESS");
-	            responsebody.setData("Snacks with ID " + id + " deleted successfully.");
+	            responsebody.setData("Fruits with ID " + id + " deleted successfully.");
 	            return ResponseEntity.ok(responsebody);
 	        } 
 	}

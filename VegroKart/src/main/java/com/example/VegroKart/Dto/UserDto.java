@@ -30,7 +30,6 @@ public class UserDto {
 
 	    private String mobileNumber;
 
-
 	    private String password;
 	   
 	    private String myAddress;
