@@ -166,7 +166,7 @@ public class UserService {
 	 
 	
 	
-	//user resetPassword By mobile number
+	//user resetPassword By userId
 		 public User resetPasswordById(long userId, ResetPassword resetPassword) {
 		        Optional<User> optionalUser = userRepository.findById(userId);
 		        if (optionalUser.isPresent()) {
@@ -183,7 +183,7 @@ public class UserService {
 		        }
 		    }
 	 
-	//user resetPassword By userId
+	//user resetPassword by user mobile number
 	 public User resetPassword(String mobileNumber, ResetPassword resetPassword) {
 	        Optional<User> optionalUser = userRepository.findByMobileNumber(mobileNumber);
 	        if (optionalUser.isPresent()) {
@@ -265,6 +265,7 @@ public class UserService {
 		        userDto.setEmailAddress(user.getEmailAddress());
 		        userDto.setMobileNumber(user.getMobileNumber());
 		        userDto.setMyAddress(user.getMyAddress());
+		        user.setInstantDelivery(user.getInstantDelivery());
 		        userDto.setPassword(user.getPassword());
 		        if (user.getImage() != null) {
 		            try {
@@ -305,6 +306,41 @@ public class UserService {
 		userDto.setName(user.getName());
 		userDto.setEmailAddress(user.getEmailAddress());
 		userDto.setMobileNumber(user.getMobileNumber());
+		user.setInstantDelivery(user.getInstantDelivery());
+		userDto.setMyAddress(user.getMyAddress());
+		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
+		  if (user.getImage() != null) {
+	            try {
+	                Blob imageBlob = user.getImage();
+	                if (imageBlob != null) {
+	                    byte[] image = imageBlob.getBytes(1, (int) imageBlob.length());
+	                    userDto.setImage(Base64.getEncoder().encodeToString(image));
+	                } else {
+	                    userDto.setImage(null);
+	                }
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
+	        } else {
+	            userDto.setImage(null);
+	        }
+	        String imageUrl = "/user/getall/image?id=" + user.getId();
+	        userDto.setImage(imageUrl);
+		return userDto;
+	 }
+	 
+	 @Transactional
+	 public UserDto getUserByMobileNumber(String mobileNumber) throws SQLException {
+		 Optional<User> userOptional=userRepository.findByMobileNumber(mobileNumber);
+		 if (userOptional.isEmpty()) {
+			throw new UserIsNotFoundException("user not found with this mobileNumber :" + mobileNumber);
+		}
+		 User user=userOptional.get();
+		 UserDto userDto=new UserDto();
+		 userDto.setId(user.getId());
+		userDto.setName(user.getName());
+		userDto.setEmailAddress(user.getEmailAddress());
+		userDto.setMobileNumber(user.getMobileNumber());
 		userDto.setMyAddress(user.getMyAddress());
 		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
 		  if (user.getImage() != null) {
@@ -328,8 +364,8 @@ public class UserService {
 	 }
 	 
 	  @Transactional
-	    public User updateUser(long id, String name, String emailAddress, String mobileNumber, String password,
-	            MultipartFile file, String myAddress) throws IOException, SerialException, SQLException {
+	    public User updateUserById(long id, String name, String emailAddress, String mobileNumber, String password,
+	            MultipartFile file) throws IOException, SerialException, SQLException {
 	        Optional<User> optionalExistingUser = userRepository.findById(id);
 
 	        if (optionalExistingUser.isEmpty()) {
@@ -340,8 +376,7 @@ public class UserService {
 	        existingUser.setName(name);
 	        existingUser.setEmailAddress(emailAddress);
 	        existingUser.setMobileNumber(mobileNumber);
-	        existingUser.setPassword(password);
-	        existingUser.setMyAddress(myAddress);
+	        existingUser.setPassword(encryptionService.encryptPassword(password));
 
 	        if (file != null && !file.isEmpty()) {
 	            byte[] bytes = file.getBytes();
@@ -351,6 +386,18 @@ public class UserService {
 
 	        userRepository.save(existingUser);
 
+	        return existingUser;
+	    }
+	  
+	  @Transactional
+	    public User updateUser(long id,String myAddress) throws IOException, SerialException, SQLException {
+	        Optional<User> optionalExistingUser = userRepository.findById(id);
+	        if (optionalExistingUser.isEmpty()) {
+	            throw new UserIsNotFoundException("user not found with id :" + id);
+	        }
+	        User existingUser = optionalExistingUser.get();
+	        existingUser.setMyAddress(myAddress);
+	        userRepository.save(existingUser);
 	        return existingUser;
 	    }
 
