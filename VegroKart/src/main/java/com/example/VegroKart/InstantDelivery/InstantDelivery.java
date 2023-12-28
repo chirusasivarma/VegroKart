@@ -93,6 +93,8 @@ public class InstantDelivery {
 
 	    private int quantity;
 	    
+	    private String status;
+	    
 	    private Instant deliveryTime;
 
 

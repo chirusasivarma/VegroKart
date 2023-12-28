@@ -15,6 +15,7 @@ import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Entity.PersonalCare;
 import com.example.VegroKart.Entity.SaucesAndOil;
 import com.example.VegroKart.Entity.Snacks;
+import com.example.VegroKart.Entity.Status;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
@@ -30,6 +31,7 @@ import com.example.VegroKart.Repository.SaucesAndOilRepository;
 import com.example.VegroKart.Repository.SnacksRepository;
 import com.example.VegroKart.Repository.UserRepository;
 import com.example.VegroKart.Repository.VegetablesRepository;
+
 
 @Service
 public class InstantDeliveryService {
@@ -95,6 +97,7 @@ public class InstantDeliveryService {
                 InstantDelivery instantDelivery = new InstantDelivery();
                 instantDelivery.setUser(user);
                 instantDelivery.setQuantity(quantity);
+                instantDelivery.setStatus(Status.WAITING);
                 instantDelivery.setDeliveryTime(Instant.now());
 
                 switch (categoryName) {
