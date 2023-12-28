@@ -114,7 +114,8 @@ public class UserController {
 	         body.setData("Password reset successfully!");
 	         return ResponseEntity.status(HttpStatus.OK).body(body);
 	     }
-	     @PatchMapping("/resetpasswords/{userId}")
+	     
+	     @PatchMapping("/resetpassword/{userId}")
 	     public ResponseEntity<ResponseBody<?>> resetPasswordById( @PathVariable("userId") long userId,
 	             @Valid @RequestBody ResetPassword resetPassword) {
 	         userService.resetPasswordById(userId, resetPassword);
@@ -151,10 +152,26 @@ public class UserController {
 			throw new UserIsNotFoundException("Users list empty");
 		}
 	 }
+
+	 
 		 
-		 @GetMapping("/getby/{id}")
+		 @GetMapping("/get/{id}")
 		 public ResponseEntity<ResponseBody<?>> getUserById(@PathVariable("id") long id) throws SQLException{
 			 UserDto user= userService.getUserById(id);
+			 if (user !=null) {
+				 ResponseBody<UserDto> body=new ResponseBody<UserDto>();
+				 body.setStatusCode(HttpStatus.OK.value());
+				 body.setStatus("SUCCESS");
+				 body.setData(user);
+				 return ResponseEntity.status(HttpStatus.OK).body(body);	
+			}else {
+				throw new UserIsNotFoundException("Users list empty");
+			}		 
+	      }
+		 
+		 @GetMapping("/getby/{mobileNumber}")
+		 public ResponseEntity<ResponseBody<?>> getUserById(@PathVariable("mobileNumber") String mobileNumber) throws SQLException{
+			 UserDto user= userService.getUserByMobileNumber(mobileNumber);
 			 if (user !=null) {
 				 ResponseBody<UserDto> body=new ResponseBody<UserDto>();
 				 body.setStatusCode(HttpStatus.OK.value());
@@ -185,8 +202,19 @@ public class UserController {
 		 public ResponseEntity<ResponseBody<User>> updateUserById(@PathVariable("id") long id,
 				 @RequestParam("file") MultipartFile file,@RequestParam("name")String name,
 				 @RequestParam("mobileNumber")String mobileNumber,@RequestParam("emailAddress") String emailAddress,
-				 @RequestParam("myAddress") String myAddress,@RequestParam("password") String password) throws SerialException, IOException, SQLException{
-			 User user=userService.updateUser(id, name, emailAddress, mobileNumber, password, file, myAddress);
+				 @RequestParam("password") String password) throws SerialException, IOException, SQLException{
+			 User user=userService.updateUserById(id, name, emailAddress, mobileNumber, password, file);
+			 ResponseBody<User> body= new ResponseBody<User>();
+			 body.setStatusCode(HttpStatus.OK.value());
+			 body.setStatus("SUCCESS");
+			 body.setData(user);
+			 return ResponseEntity.ok(body);
+		 }
+		 
+		 @PutMapping("/updateAddress/{id}")
+		 public ResponseEntity<ResponseBody<User>> updateUserById(@PathVariable("id") long id,
+				 @RequestParam("myAddress") String myAddress) throws SerialException, IOException, SQLException{
+			 User user=userService.updateUser(id, myAddress);
 			 ResponseBody<User> body= new ResponseBody<User>();
 			 body.setStatusCode(HttpStatus.OK.value());
 			 body.setStatus("SUCCESS");
