@@ -15,4 +15,7 @@ public interface FruitsRepository extends JpaRepository<Fruits,Long> {
 
 	List<Fruits> findByFruitName(String fruitName);
 
-}
+	List<Fruits> findByIdGreaterThan(long deletedId);
+
+	
+	}

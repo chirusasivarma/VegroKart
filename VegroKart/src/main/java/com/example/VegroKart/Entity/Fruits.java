@@ -13,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +28,7 @@ public class Fruits {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	
 	private String fruitName;
 	
 	private int quantity;
@@ -36,9 +39,4 @@ public class Fruits {
 	@JsonIgnore
 	private Blob image;
 	
-	@ManyToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(name = "user_id")
-	private User user;
-
-
 }

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.example.VegroKart.Entity.Fruits;
+import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Helper.ResponseBody;
 
 
@@ -19,5 +21,6 @@ public class ResponseEntityException extends ResponseEntityExceptionHandler {
 		body.setData(exception.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
 	}
+	
 	
 }
