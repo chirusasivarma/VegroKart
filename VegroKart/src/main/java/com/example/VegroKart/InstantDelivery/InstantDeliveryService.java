@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.VegroKart.Dto.BookingDetailsResponse;
 import com.example.VegroKart.Dto.Status;
+import com.example.VegroKart.Entity.BabyItems;
 import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.CannedGoods;
 import com.example.VegroKart.Entity.DairyProducts;
@@ -16,12 +17,14 @@ import com.example.VegroKart.Entity.FrozenFoods;
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Entity.PersonalCare;
+import com.example.VegroKart.Entity.PetFood;
 import com.example.VegroKart.Entity.SaucesAndOil;
 import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
+import com.example.VegroKart.Repository.BabyItemsRepository;
 import com.example.VegroKart.Repository.BeveragesRepository;
 import com.example.VegroKart.Repository.CannedGoodsRepository;
 import com.example.VegroKart.Repository.DairyProductsRepository;
@@ -29,6 +32,7 @@ import com.example.VegroKart.Repository.FrozenFoodsRepository;
 import com.example.VegroKart.Repository.FruitsRepository;
 import com.example.VegroKart.Repository.MeatRepository;
 import com.example.VegroKart.Repository.PersonalCareRepository;
+import com.example.VegroKart.Repository.PetFoodRepository;
 import com.example.VegroKart.Repository.SaucesAndOilRepository;
 import com.example.VegroKart.Repository.SnacksRepository;
 import com.example.VegroKart.Repository.UserRepository;
@@ -72,6 +76,12 @@ public class InstantDeliveryService {
 	private PersonalCareRepository personalCareRepository;
 	@Autowired
 	private SaucesAndOilRepository saucesAndOilRepository;
+	
+	@Autowired
+	private BabyItemsRepository babyItemsRepository;
+	
+	@Autowired
+	private PetFoodRepository petFoodRepository;
 
     public List<InstantDelivery> getAllInstantDeliveries() {
         return instantDeliveryRepository.findAll();
@@ -153,6 +163,17 @@ public class InstantDeliveryService {
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
                         instantDelivery.setSaucesAndOils(saucesAndOil);
                         break;
+                    case "babyItem":
+                        BabyItems babyItem = babyItemsRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
+                        instantDelivery.setBabyItem(babyItem);
+                        break;
+                    case "petFood":
+                        PetFood petFood = petFoodRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
+                        instantDelivery.setPetFood(petFood);
+                        break;
+   
                     
                 }
 
@@ -227,7 +248,13 @@ public class InstantDeliveryService {
         } else if (instantDelivery.getSaucesAndOils() != null) {
             response.setBookedItem(instantDelivery.getSaucesAndOils());
             response.setCategory("Sauces and Oils");
-        }
+        } else if (instantDelivery.getBabyItem() != null) {
+        	response.setBookedItem(instantDelivery.getBabyItem());
+        	response.setCategory("babyItem");
+        }else if (instantDelivery.getPersonalCare() !=null) {
+        	response.setBookedItem(instantDelivery.getPetFood());
+			response.setCategory("petFood");
+		}
         
     }
     
