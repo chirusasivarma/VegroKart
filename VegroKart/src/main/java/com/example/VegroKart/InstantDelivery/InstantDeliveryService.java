@@ -1,11 +1,14 @@
 package com.example.VegroKart.InstantDelivery;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.VegroKart.Dto.BookingDetailsResponse;
+import com.example.VegroKart.Dto.Status;
 import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.CannedGoods;
 import com.example.VegroKart.Entity.DairyProducts;
@@ -15,7 +18,6 @@ import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Entity.PersonalCare;
 import com.example.VegroKart.Entity.SaucesAndOil;
 import com.example.VegroKart.Entity.Snacks;
-import com.example.VegroKart.Entity.Status;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
@@ -97,7 +99,7 @@ public class InstantDeliveryService {
                 InstantDelivery instantDelivery = new InstantDelivery();
                 instantDelivery.setUser(user);
                 instantDelivery.setQuantity(quantity);
-                instantDelivery.setStatus(Status.WAITING);
+                instantDelivery.setStatus(Status.Ontheway);
                 instantDelivery.setDeliveryTime(Instant.now());
 
                 switch (categoryName) {
@@ -158,4 +160,101 @@ public class InstantDeliveryService {
             }
         }
     }
+    
+    
+    
+    public String approveinstantDelivery(Long id) {
+		InstantDelivery instantDelivery = instantDeliveryRepository.findById(id).get();
+		instantDelivery.setStatus(Status.Delivered);
+		instantDeliveryRepository.save(instantDelivery);
+		return "Order Deliverd";
+    }
+    
+    
+    
+    public String cancelledinstantDelivery(Long id) {
+		InstantDelivery instantDelivery = instantDeliveryRepository.findById(id).get();
+		instantDelivery.setStatus(Status.Cancelled);
+		instantDeliveryRepository.save(instantDelivery);
+		return "Order cancelled";
+    }
+    
+    
+    public BookingDetailsResponse getBookingDetails(Long bookingId) {
+        InstantDelivery instantDelivery = instantDeliveryRepository.findById(bookingId)
+                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Booking ID"));
+
+        BookingDetailsResponse response = new BookingDetailsResponse();
+        response.setId(instantDelivery.getId());
+        response.setUser(instantDelivery.getUser());
+        response.setQuantity(instantDelivery.getQuantity());
+        response.setStatus(instantDelivery.getStatus());
+        response.setDeliveryTime(instantDelivery.getDeliveryTime());
+
+        setBookedItemAndCategory(instantDelivery, response);
+
+        return response;
+    }
+
+    private void setBookedItemAndCategory(InstantDelivery instantDelivery, BookingDetailsResponse response) {
+        if (instantDelivery.getFruit() != null) {
+            response.setBookedItem(instantDelivery.getFruit());
+            response.setCategory("Fruit");
+        } else if (instantDelivery.getSnack() != null) {
+            response.setBookedItem(instantDelivery.getSnack());
+            response.setCategory("Snack");
+        } else if (instantDelivery.getVegetable() != null) {
+            response.setBookedItem(instantDelivery.getVegetable());
+            response.setCategory("Vegetable");
+        } else if (instantDelivery.getMeat() != null) {
+            response.setBookedItem(instantDelivery.getMeat());
+            response.setCategory("Meat");
+        } else if (instantDelivery.getBeverage() != null) {
+            response.setBookedItem(instantDelivery.getBeverage());
+            response.setCategory("Beverage");
+        } else if (instantDelivery.getDairyProduct() != null) {
+            response.setBookedItem(instantDelivery.getDairyProduct());
+            response.setCategory("Dairy Product");
+        } else if (instantDelivery.getCannedGood() != null) {
+            response.setBookedItem(instantDelivery.getCannedGood());
+            response.setCategory("Canned Good");
+        } else if (instantDelivery.getFrozenFood() != null) {
+            response.setBookedItem(instantDelivery.getFrozenFood());
+            response.setCategory("Frozen Food");
+        } else if (instantDelivery.getPersonalCare() != null) {
+            response.setBookedItem(instantDelivery.getPersonalCare());
+            response.setCategory("Personal Care");
+        } else if (instantDelivery.getSaucesAndOils() != null) {
+            response.setBookedItem(instantDelivery.getSaucesAndOils());
+            response.setCategory("Sauces and Oils");
+        }
+        
+    }
+    
+    
+    public List<BookingDetailsResponse> getAllBookingDetails() {
+        List<InstantDelivery> allInstantDeliveries = instantDeliveryRepository.findAll();
+
+        List<BookingDetailsResponse> responses = new ArrayList<>();
+        for (InstantDelivery instantDelivery : allInstantDeliveries) {
+            BookingDetailsResponse response = new BookingDetailsResponse();
+            response.setId(instantDelivery.getId());
+            response.setUser(instantDelivery.getUser());
+            response.setQuantity(instantDelivery.getQuantity());
+            response.setStatus(instantDelivery.getStatus());
+            response.setDeliveryTime(instantDelivery.getDeliveryTime());
+
+            setBookedItemAndCategory(instantDelivery, response);
+
+            responses.add(response);
+        }
+
+        return responses;
+    }
+    
+    
+    
+    
+    
+    
 }

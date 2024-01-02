@@ -2,6 +2,7 @@ package com.example.VegroKart.InstantDelivery;
 
 import java.time.Instant;
 
+import com.example.VegroKart.Dto.Status;
 import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.CannedGoods;
 import com.example.VegroKart.Entity.DairyProducts;
@@ -15,6 +16,8 @@ import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -93,7 +96,8 @@ public class InstantDelivery {
 
 	    private int quantity;
 	    
-	    private String status;
+	    @Enumerated(EnumType.STRING)
+	    private Status status;
 	    
 	    private Instant deliveryTime;
 
