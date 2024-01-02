@@ -66,10 +66,11 @@ public class User {
 //    private List<MyAddress> myAddress;
 //	
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<InstantDelivery> instantDelivery ;
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<InstantDelivery> instantDelivery;
+
+
     
 
 }

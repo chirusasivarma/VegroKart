@@ -207,7 +207,9 @@ public class InstantDeliveryService {
 
         BookingDetailsResponse response = new BookingDetailsResponse();
         response.setId(instantDelivery.getId());
-        response.setUser(instantDelivery.getUser());
+        response.setName(instantDelivery.getUser().getName());
+        response.setMobileNumber(instantDelivery.getUser().getMobileNumber());
+        response.setMyAddress(instantDelivery.getUser().getMyAddress());
         response.setQuantity(instantDelivery.getQuantity());
         response.setStatus(instantDelivery.getStatus());
         response.setDeliveryTime(instantDelivery.getDeliveryTime());
@@ -266,7 +268,9 @@ public class InstantDeliveryService {
         for (InstantDelivery instantDelivery : allInstantDeliveries) {
             BookingDetailsResponse response = new BookingDetailsResponse();
             response.setId(instantDelivery.getId());
-            response.setUser(instantDelivery.getUser());
+            response.setName(instantDelivery.getUser().getName());
+            response.setMobileNumber(instantDelivery.getUser().getMobileNumber());
+            response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
             response.setDeliveryTime(instantDelivery.getDeliveryTime());
@@ -280,8 +284,36 @@ public class InstantDeliveryService {
     }
     
     
-    
-    
+ 
+    public List<BookingDetailsResponse> getBookingDetailsByUserId(Long userId) {
+        List<InstantDelivery> instantDeliveries = instantDeliveryRepository.findByUserId(userId);
+
+        if (instantDeliveries.isEmpty()) {
+            throw new ProductsIsNotFoundException("No bookings found for the given User ID");
+        }
+
+        List<BookingDetailsResponse> responses = new ArrayList<>();
+
+        for (InstantDelivery instantDelivery : instantDeliveries) {
+            BookingDetailsResponse response = new BookingDetailsResponse();
+            response.setId(instantDelivery.getId());
+            response.setName(instantDelivery.getUser().getName());
+            response.setMobileNumber(instantDelivery.getUser().getMobileNumber());
+            response.setMyAddress(instantDelivery.getUser().getMyAddress());
+            response.setQuantity(instantDelivery.getQuantity());
+            response.setStatus(instantDelivery.getStatus());
+            response.setDeliveryTime(instantDelivery.getDeliveryTime());
+
+            setBookedItemAndCategory(instantDelivery, response);
+
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+
+
     
     
 }

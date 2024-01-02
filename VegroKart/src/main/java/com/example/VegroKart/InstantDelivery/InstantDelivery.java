@@ -16,6 +16,8 @@ import com.example.VegroKart.Entity.SaucesAndOil;
 import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +37,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "InstantDelivery")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InstantDelivery {
 	
 	
@@ -44,6 +47,7 @@ public class InstantDelivery {
 
 	    @ManyToOne
 	    @JoinColumn(name = "user_id")
+	    @JsonIgnore
 	    private User user;
 
 	    @ManyToOne

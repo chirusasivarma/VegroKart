@@ -427,22 +427,13 @@ public class UserService {
 	  }
 	  
 	  
-	  
-//	  public boolean verifyOtp(String userId, String userEnteredOtp) {
-//	        try {
-//	            User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
-//	            if (user != null) {
-//	                String storedOtp = user.getOtp();
-//
-//	                return OtpService.verifyOtp(userId, userEnteredOtp);
-//	            } else {
-//	                log.info("User with ID {} not found", userId);
-//	            }
-//	        } catch (Exception e) {
-//	            log.error("Error verifying OTP: {}", e.getMessage());
-//	        }
-//	        return false;
-//	    }
+	  public Optional<User> getUserById(Long userId) {
+	        return userRepository.findById(userId);
+	    }
+
+	    public Optional<User> getUserWithInstantDelivery(Long userId) {
+	        return userRepository.findByIdWithInstantDelivery(userId);
+	    }
 
 
 }
