@@ -245,4 +245,29 @@ public class UserController {
 		            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
 		        }
 		    }
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  @GetMapping("/{userId}")
+		    public ResponseEntity<Object> getUserDetails(@PathVariable Long userId) {
+		        try {
+		            // Retrieve user details with instant delivery orders by user ID
+		            var userOptional = userService.getUserWithInstantDelivery(userId);
+
+		            if (userOptional.isPresent()) {
+		                // User found, return user details
+		                return ResponseEntity.status(HttpStatus.OK).body(userOptional.get());
+		            } else {
+		                // User not found
+		                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+		            }
+		        } catch (Exception e) {
+		            // Handle other exceptions
+		            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
+		        }
+		    }
 }

@@ -35,12 +35,12 @@ public class InstantDeliveryController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ResponseBody<List<InstantDelivery>>> getInstantDeliveriesByUser(@PathVariable Long userId) {
-        List<InstantDelivery> instantDeliveries = instantDeliveryService.getInstantDeliveriesByUser(userId);
-        ResponseBody<List<InstantDelivery>> body=new ResponseBody<List<InstantDelivery>>();
+    public ResponseEntity<ResponseBody<List<BookingDetailsResponse>>> getInstantDeliveriesByUser(@PathVariable Long userId) {
+        List<BookingDetailsResponse> responses = instantDeliveryService.getBookingDetailsByUserId(userId);
+        ResponseBody<List<BookingDetailsResponse>> body=new ResponseBody<List<BookingDetailsResponse>>();
         body.setStatusCode(HttpStatus.OK.value());
         body.setStatus("SUCCESS");
-        body.setData(instantDeliveries);
+        body.setData(responses);
         return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 
@@ -68,7 +68,7 @@ public class InstantDeliveryController {
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<ResponseBody<String>> rejectinstantDelivery(@PathVariable Long id) {
-    	String result = instantDeliveryService.approveinstantDelivery(id);
+    	String result = instantDeliveryService.cancelledinstantDelivery(id);
         ResponseBody<String> body = new ResponseBody<>();
         body.setStatusCode(HttpStatus.OK.value());
         body.setStatus("SUCCESS");
@@ -96,6 +96,7 @@ public class InstantDeliveryController {
         return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 
+ 
     
 
 }

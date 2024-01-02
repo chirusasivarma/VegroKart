@@ -12,7 +12,9 @@ import lombok.Setter;
 @Setter
 public class BookingDetailsResponse {
 	private Long id;
-    private User user;
+    private String name;
+    private String mobileNumber;
+    private String myAddress;
     private Object bookedItem;
     private String category;
     private int quantity;
