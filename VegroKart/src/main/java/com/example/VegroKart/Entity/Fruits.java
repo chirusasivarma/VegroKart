@@ -28,7 +28,7 @@ public class Fruits {
     private Long id;
 
     @NotBlank(message = "Fruit name cannot be empty")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Fruit name should contain only alphabets")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Fruit name should contain only alphabets")
     private String fruitName;
 
     @NotNull(message = "Quantity cannot be empty")

@@ -24,9 +24,11 @@ import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.BeveragesResponse;
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
+import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.BeveragesService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/beverages")
@@ -37,20 +39,40 @@ public class BeveragesController {
 
 	
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<Beverages>> saveBeverages(
-			@RequestParam("file") MultipartFile file, @RequestParam("beveragesName") String beveragesName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<BeveragesResponse>> saveBeverages(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("beveragesName") String beveragesName,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		Beverages beverages = beveragesService.saveBeverages(request, file, beveragesName,quantity, price);
-				
-		ResponseBody<Beverages> beveragesbody = new ResponseBody<Beverages>();
-		beveragesbody.setStatusCode(HttpStatus.OK.value());
-		beveragesbody.setStatus("SUCCESS");
-		beveragesbody.setData(beverages);
-		return ResponseEntity.ok(beveragesbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new ProductsIsNotFoundException("Image file is required");
+	    }
 
+	    Beverages beverages = beveragesService.saveBeverages(request, file, beveragesName, quantity, price);
+
+	    BeveragesResponse beveragesResponse = new BeveragesResponse();
+	    beveragesResponse.setId(beverages.getId());
+	    beveragesResponse.setBeveragesName(beverages.getBeveragesName());
+	    beveragesResponse.setQuantity(beverages.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        beveragesResponse.setImage("Image is present");
+	    } else {
+	        beveragesResponse.setImage("");
+	    }
+
+	    beveragesResponse.setPrice(beverages.getPrice());
+
+	    ResponseBody<BeveragesResponse> beveragesBody = new ResponseBody<>();
+	    beveragesBody.setStatusCode(HttpStatus.OK.value());
+	    beveragesBody.setStatus("SUCCESS");
+	    beveragesBody.setData(beveragesResponse);
+
+	    return ResponseEntity.ok(beveragesBody);
 	}
+
 	@GetMapping("/allBeverages")
 
 	public ResponseEntity<?> getAllBeverages() {
@@ -110,7 +132,7 @@ public class BeveragesController {
 	public ResponseEntity<ResponseBody<String>> updateBeverages(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("beveragesName") String beveragesName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = beveragesService.updatebeverages(id, beveragesName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

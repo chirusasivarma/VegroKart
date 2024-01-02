@@ -68,7 +68,7 @@ public class InstantDeliveryController {
 
     @PutMapping("/cancel/{id}")
     public ResponseEntity<ResponseBody<String>> rejectinstantDelivery(@PathVariable Long id) {
-    	String result = instantDeliveryService.approveinstantDelivery(id);
+    	String result = instantDeliveryService.cancelledinstantDelivery(id);
         ResponseBody<String> body = new ResponseBody<>();
         body.setStatusCode(HttpStatus.OK.value());
         body.setStatus("SUCCESS");

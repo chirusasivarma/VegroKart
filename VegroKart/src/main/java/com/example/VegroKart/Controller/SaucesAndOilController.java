@@ -26,6 +26,7 @@ import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.SaucesAndOilService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/sauces")
@@ -35,20 +36,40 @@ public class SaucesAndOilController {
 	public SaucesAndOilService saucesAndOilService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<SaucesAndOil>> saveSaucesAndOil(
-			@RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<SaucesAndOilResponse>> saveSaucesAndOil(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("name") String name,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		SaucesAndOil saucesAndOil = saucesAndOilService.saveSaucesAndOil(request, file, name,
-				quantity, price);
-		ResponseBody<SaucesAndOil> saucesAndOilbody = new ResponseBody<SaucesAndOil>();
-		saucesAndOilbody.setStatusCode(HttpStatus.OK.value());
-		saucesAndOilbody.setStatus("SUCCESS");
-		saucesAndOilbody.setData(saucesAndOil);
-		return ResponseEntity.ok(saucesAndOilbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new IllegalArgumentException("Image file is required");
+	    }
 
+	    SaucesAndOil saucesAndOil = saucesAndOilService.saveSaucesAndOil(request, file, name, quantity, price);
+
+	    SaucesAndOilResponse saucesAndOilResponse = new SaucesAndOilResponse();
+	    saucesAndOilResponse.setId(saucesAndOil.getId());
+	    saucesAndOilResponse.setName(saucesAndOil.getName());
+	    saucesAndOilResponse.setQuantity(saucesAndOil.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        saucesAndOilResponse.setImage("Image is present");
+	    } else {
+	        saucesAndOilResponse.setImage("");
+	    }
+
+	    saucesAndOilResponse.setPrice(saucesAndOil.getPrice());
+
+	    ResponseBody<SaucesAndOilResponse> saucesAndOilBody = new ResponseBody<>();
+	    saucesAndOilBody.setStatusCode(HttpStatus.OK.value());
+	    saucesAndOilBody.setStatus("SUCCESS");
+	    saucesAndOilBody.setData(saucesAndOilResponse);
+
+	    return ResponseEntity.ok(saucesAndOilBody);
 	}
+
 	@GetMapping("/getAll")
 
 	public ResponseEntity<?> getAllSauceAndOil() {
@@ -109,7 +130,7 @@ public class SaucesAndOilController {
 	public ResponseEntity<ResponseBody<String>> updateSauceAndOil(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = saucesAndOilService.updatesaucesAndOil(id, name, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

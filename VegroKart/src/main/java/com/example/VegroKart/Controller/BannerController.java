@@ -48,14 +48,14 @@ public class BannerController {
     }
 
     
-    @GetMapping("/get-all-banners")
-    public ResponseEntity<ResponseBody<List<Banner>>> getAllBannersData() {
-        List<Banner> banners = bannerService.getAllBanners();
-        ResponseBody<List<Banner>> bannerbody = new ResponseBody<>();
-        bannerbody.setStatusCode(HttpStatus.OK.value());
-        bannerbody.setStatus("SUCCESS");
-        bannerbody.setData(banners);
-        return ResponseEntity.ok(bannerbody); 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ResponseBody<BannerResponse>> getBannerById(@PathVariable("id") long id) {
+        BannerResponse bannerResponse = bannerService.getBannerById(id);
+        ResponseBody<BannerResponse> responseBody = new ResponseBody<>();
+        responseBody.setStatusCode(HttpStatus.OK.value());
+        responseBody.setStatus("SUCCESS");
+        responseBody.setData(bannerResponse);
+        return ResponseEntity.ok().contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(responseBody);
     }
 
     @PutMapping("/update/{id}")
