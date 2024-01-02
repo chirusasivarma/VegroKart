@@ -21,6 +21,7 @@ import com.example.VegroKart.Repository.SnacksRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -30,8 +31,8 @@ public class SnacksService {
 	@Autowired
 	private SnacksRepository snacksRepository;
 
-	public Snacks saveFruits(HttpServletRequest request, MultipartFile file, String snacksName, int quantity,
-			double price)throws IOException, SerialException, SQLException {
+	public Snacks saveSnacks(HttpServletRequest request, @Valid MultipartFile file, String snacksName,
+			String quantity, String price) throws IOException, SerialException, SQLException {
 			
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -110,7 +111,7 @@ public class SnacksService {
 		return snacksResponses;
 	}
 
-	public String updatesnacks(long id, String snacksName, int quantity, double price, MultipartFile file) throws IOException, SerialException, SQLException{
+	public String updatesnacks(long id, String snacksName, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException{
 		
 			
 			Optional<Snacks> optionalExistingSnacks = snacksRepository.findById(id);
@@ -177,6 +178,7 @@ public class SnacksService {
 	        }
 	    }
 
+		
 	    // Other methods in your service...
 	}
 

@@ -23,9 +23,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.VegroKart.Entity.DairyProducts;
 import com.example.VegroKart.Entity.DairyProductsResponse;
 import com.example.VegroKart.Entity.SnacksResponse;
+import com.example.VegroKart.Exception.DairyProductsIsNotFoundException;
+import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.DairyProductsService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/dairy")
@@ -35,20 +38,40 @@ public class DairyProductsController {
 
 	
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<DairyProducts>> saveFruits(
-			@RequestParam("file") MultipartFile file, @RequestParam("productName") String productName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<DairyProductsResponse>> saveDairyProducts(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("productName") String productName,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		DairyProducts dairyProducts = dairyProductsService.saveDairyProducts(request, file, productName, quantity, price);
-				
-		ResponseBody<DairyProducts> dairyProductsbody = new ResponseBody<DairyProducts>();
-		dairyProductsbody.setStatusCode(HttpStatus.OK.value());
-		dairyProductsbody.setStatus("SUCCESS");
-		dairyProductsbody.setData(dairyProducts);
-		return ResponseEntity.ok(dairyProductsbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new ProductsIsNotFoundException("Image file is required");
+	    }
 
+	    DairyProducts dairyProducts = dairyProductsService.saveDairyProducts(request, file, productName, quantity, price);
+
+	    DairyProductsResponse dairyProductsResponse = new DairyProductsResponse();
+	    dairyProductsResponse.setId(dairyProducts.getId());
+	    dairyProductsResponse.setProductName(dairyProducts.getProductName());
+	    dairyProductsResponse.setQuantity(dairyProducts.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        dairyProductsResponse.setImage("Image is Uploaded");
+	    } else {
+	        dairyProductsResponse.setImage("");
+	    }
+
+	    dairyProductsResponse.setPrice(dairyProducts.getPrice());
+
+	    ResponseBody<DairyProductsResponse> dairyProductsBody = new ResponseBody<>();
+	    dairyProductsBody.setStatusCode(HttpStatus.OK.value());
+	    dairyProductsBody.setStatus("SUCCESS");
+	    dairyProductsBody.setData(dairyProductsResponse);
+
+	    return ResponseEntity.ok(dairyProductsBody);
 	}
+
 	@GetMapping("/getById/{id}")
     public ResponseEntity<ResponseBody<DairyProductsResponse>> getDairyProductsById(@PathVariable("id") long id) {
 		DairyProductsResponse dairyProductsResponse = dairyProductsService.getDairyProductsById(id);
@@ -88,7 +111,7 @@ public class DairyProductsController {
 	public ResponseEntity<ResponseBody<String>> updateDairyProducts(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("productsName") String productsName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = dairyProductsService.updatedairyProducts(id, productsName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

@@ -24,10 +24,12 @@ import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
 import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Entity.MeatResponse;
+import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.MeatService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/meat")
@@ -38,20 +40,40 @@ public class MeatController {
 
 	
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<Meat>> saveMeat(
-			@RequestParam("file") MultipartFile file, @RequestParam("meatName") String meatName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<MeatResponse>> saveMeat(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("meatName") String meatName,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		Meat meat = meatService.saveMeat(request, file, meatName,quantity, price);
-				
-		ResponseBody<Meat> meatbody = new ResponseBody<Meat>();
-		meatbody.setStatusCode(HttpStatus.OK.value());
-		meatbody.setStatus("SUCCESS");
-		meatbody.setData(meat);
-		return ResponseEntity.ok(meatbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new ProductsIsNotFoundException("Image file is required");
+	    }
 
+	    Meat meat = meatService.saveMeat(request, file, meatName, quantity, price);
+
+	    MeatResponse meatResponse = new MeatResponse();
+	    meatResponse.setId(meat.getId());
+	    meatResponse.setMeatName(meat.getMeatName());
+	    meatResponse.setQuantity(meat.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        meatResponse.setImage("Image is Uploaded");
+	    } else {
+	        meatResponse.setImage("");
+	    }
+
+	    meatResponse.setPrice(meat.getPrice());
+
+	    ResponseBody<MeatResponse> meatBody = new ResponseBody<>();
+	    meatBody.setStatusCode(HttpStatus.OK.value());
+	    meatBody.setStatus("SUCCESS");
+	    meatBody.setData(meatResponse);
+
+	    return ResponseEntity.ok(meatBody);
 	}
+
 	@GetMapping("/allMeats")
 
 	public ResponseEntity<?> getAllMeat() {
@@ -107,7 +129,7 @@ public class MeatController {
 	public ResponseEntity<ResponseBody<String>> updateMeat(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("meatName") String meatName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = meatService.updatemeat(id, meatName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

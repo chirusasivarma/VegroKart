@@ -26,6 +26,7 @@ import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.PetFoodService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/petFood")
@@ -35,20 +36,40 @@ public class PetFoodController {
 	public PetFoodService petFoodService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<PetFood>> savePetFood(
-			@RequestParam("file") MultipartFile file, @RequestParam("foodName") String foodName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<PetFoodResponse>> savePetFood(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("foodName") String foodName,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		PetFood petFood = petFoodService.savePetFood(request, file, foodName,
-				quantity, price);
-		ResponseBody<PetFood> petFoodbody = new ResponseBody<PetFood>();
-		petFoodbody.setStatusCode(HttpStatus.OK.value());
-		petFoodbody.setStatus("SUCCESS");
-		petFoodbody.setData(petFood);
-		return ResponseEntity.ok(petFoodbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new IllegalArgumentException("Image file is required");
+	    }
 
+	    PetFood petFood = petFoodService.savePetFood(request, file, foodName, quantity, price);
+
+	    PetFoodResponse petFoodResponse = new PetFoodResponse();
+	    petFoodResponse.setId(petFood.getId());
+	    petFoodResponse.setFoodName(petFood.getFoodName());
+	    petFoodResponse.setQuantity(petFood.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        petFoodResponse.setImage("Image is present");
+	    } else {
+	        petFoodResponse.setImage("");
+	    }
+
+	    petFoodResponse.setPrice(petFood.getPrice());
+
+	    ResponseBody<PetFoodResponse> petFoodBody = new ResponseBody<>();
+	    petFoodBody.setStatusCode(HttpStatus.OK.value());
+	    petFoodBody.setStatus("SUCCESS");
+	    petFoodBody.setData(petFoodResponse);
+
+	    return ResponseEntity.ok(petFoodBody);
 	}
+
 	@GetMapping("/allPetFood")
 
 	public ResponseEntity<?> getAllPetFood() {
@@ -109,7 +130,7 @@ public class PetFoodController {
 	public ResponseEntity<ResponseBody<String>> updateFruits(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("foodName") String foodName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = petFoodService.updatepetFood(id, foodName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

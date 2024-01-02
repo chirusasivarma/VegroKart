@@ -131,8 +131,46 @@ public class BannerService {
 			throw new BannerNotFoundException("banner not found");
 		}
 	    }
-	
-	
+
+		public BannerResponse getBannerById(long id) {
+			    Optional<Banner> optionaldoc = bannerRepository.findById(id);
+
+			    if (optionaldoc.isEmpty()) {
+			        throw new BannerNotFoundException("Banner with ID " + id + " not found");
+			    }
+
+			    Banner banner = optionaldoc.get();
+			    BannerResponse bannerResponse = createBannerResponse(banner);
+
+			    return bannerResponse;
+			}
+
+			private BannerResponse createBannerResponse(Banner banner) {
+				BannerResponse bannerResponse = new BannerResponse();
+			    bannerResponse.setId(banner.getId());
+			   
+
+			    try {
+			        byte[] imageBytes = banner.getBanner1().getBytes(1, (int) banner.getBanner1().length());
+			        byte[] imageBytes1 = banner.getBanner2().getBytes(2, (int) banner.getBanner2().length());
+			        byte[] imageBytes2 = banner.getBanner3().getBytes(3, (int) banner.getBanner3().length());
+			        byte[] imageBytes3 = banner.getBanner4().getBytes(4, (int) banner.getBanner4().length());
+			        byte[] imageBytes4 = banner.getBanner5().getBytes(5, (int) banner.getBanner5().length());
+
+			        // Set document URLs
+			        String bannerImageUrl = "/Banner/GetById?id=" + banner.getId();
+			        bannerResponse.setBanner1(bannerImageUrl);;
+			        bannerResponse.setBanner2(bannerImageUrl);
+			        bannerResponse.setBanner3(bannerImageUrl);
+			        bannerResponse.setBanner4(bannerImageUrl);
+			        bannerResponse.setBanner5(bannerImageUrl);
+			    } catch (SQLException e) {
+			        e.printStackTrace();
+			    }
+
+			    return bannerResponse;
+			}
+
 }
 		
 	

@@ -33,7 +33,7 @@ public class PersonalCareService {
 	private PersonalCareRepository personalCareRepository;
 
 	public PersonalCare savePersonalCare(HttpServletRequest request, MultipartFile file, String name,
-			int quantity, double price)
+			String quantity, String price)
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -143,7 +143,7 @@ public class PersonalCareService {
 		return personalCareResponses;
 	}
 	
-	public String updatepersonalCare(long id, String name, int quantity, double price, MultipartFile file) throws IOException, SerialException, SQLException {
+	public String updatepersonalCare(long id, String name, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<PersonalCare> optionalExistingPersonalCare = personalCareRepository.findById(id);
 
