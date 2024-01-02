@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class FruitsResponse {
 	private Long id;
 	private String fruitName;
-	private int quantity;
+	private String quantity;
 	private String image;
-	private double price;
+	private String price;
 }
