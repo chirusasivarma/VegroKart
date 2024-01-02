@@ -26,6 +26,7 @@ import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.PersonalCareService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/personalCare")
@@ -35,20 +36,40 @@ public class PersonalCareController {
 	public PersonalCareService personalCareService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<PersonalCare>> savePersonalCare(
-			@RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<PersonalCareResponse>> savePersonalCare(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("name") String name,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		PersonalCare personalCare = personalCareService.savePersonalCare(request, file, name,
-				quantity, price);
-		ResponseBody<PersonalCare> personalCarebody = new ResponseBody<PersonalCare>();
-		personalCarebody.setStatusCode(HttpStatus.OK.value());
-		personalCarebody.setStatus("SUCCESS");
-		personalCarebody.setData(personalCare);
-		return ResponseEntity.ok(personalCarebody);
+	    if (file == null || file.isEmpty()) {
+	        throw new IllegalArgumentException("Image file is required");
+	    }
 
+	    PersonalCare personalCare = personalCareService.savePersonalCare(request, file, name, quantity, price);
+
+	    PersonalCareResponse personalCareResponse = new PersonalCareResponse();
+	    personalCareResponse.setId(personalCare.getId());
+	    personalCareResponse.setName(personalCare.getName());
+	    personalCareResponse.setQuantity(personalCare.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        personalCareResponse.setImage("Image is present");
+	    } else {
+	        personalCareResponse.setImage("");
+	    }
+
+	    personalCareResponse.setPrice(personalCare.getPrice());
+
+	    ResponseBody<PersonalCareResponse> personalCareBody = new ResponseBody<>();
+	    personalCareBody.setStatusCode(HttpStatus.OK.value());
+	    personalCareBody.setStatus("SUCCESS");
+	    personalCareBody.setData(personalCareResponse);
+
+	    return ResponseEntity.ok(personalCareBody);
 	}
+
 	@GetMapping("/getAll")
 
 	public ResponseEntity<?> getAllPersonalCarebody() {
@@ -109,7 +130,7 @@ public class PersonalCareController {
 	public ResponseEntity<ResponseBody<String>> updatePersonalCare(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = personalCareService.updatepersonalCare(id, name, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

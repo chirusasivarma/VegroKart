@@ -33,8 +33,8 @@ public class DairyProductsService {
 	@Autowired
 	private DairyProductsRepository dairyProductsRepository;
 
-	public DairyProducts saveDairyProducts(HttpServletRequest request, MultipartFile file, String productName, int quantity,
-			double price)throws IOException, SerialException, SQLException {
+	public DairyProducts saveDairyProducts(HttpServletRequest request, MultipartFile file, String productName, String quantity,
+			String price)throws IOException, SerialException, SQLException {
 			
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -117,7 +117,7 @@ public class DairyProductsService {
 		}
 	}
 
-	public String updatedairyProducts(long id, String productsName, int quantity, double price, MultipartFile file)  throws IOException, SerialException, SQLException{
+	public String updatedairyProducts(long id, String productsName, String quantity, String price, MultipartFile file)  throws IOException, SerialException, SQLException{
 		
 		Optional<DairyProducts> optionalExistingDairyProducts = dairyProductsRepository.findById(id);
 

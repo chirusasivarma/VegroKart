@@ -26,6 +26,7 @@ import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.FrozenFoodsService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/frozen")
@@ -35,20 +36,40 @@ public class FrozenFoodsController {
 	public FrozenFoodsService frozenFoodsService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<FrozenFoods>> saveFrozenFoods(
-			@RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<FrozenFoodsReponse>> saveFrozenFoods(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("name") String name,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		FrozenFoods frozenFoods = frozenFoodsService.saveFrozenFoods(request, file, name,
-				quantity, price);
-		ResponseBody<FrozenFoods> frozenFoodsbody = new ResponseBody<FrozenFoods>();
-		frozenFoodsbody.setStatusCode(HttpStatus.OK.value());
-		frozenFoodsbody.setStatus("SUCCESS");
-		frozenFoodsbody.setData(frozenFoods);
-		return ResponseEntity.ok(frozenFoodsbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new IllegalArgumentException("Image file is required");
+	    }
 
+	    FrozenFoods frozenFoods = frozenFoodsService.saveFrozenFoods(request, file, name, quantity, price);
+
+	    FrozenFoodsReponse frozenFoodsResponse = new FrozenFoodsReponse();
+	    frozenFoodsResponse.setId(frozenFoods.getId());
+	    frozenFoodsResponse.setName(frozenFoods.getName());
+	    frozenFoodsResponse.setQuantity(frozenFoods.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        frozenFoodsResponse.setImage("Image is present");
+	    } else {
+	        frozenFoodsResponse.setImage("");
+	    }
+
+	    frozenFoodsResponse.setPrice(frozenFoods.getPrice());
+
+	    ResponseBody<FrozenFoodsReponse> frozenFoodsBody = new ResponseBody<>();
+	    frozenFoodsBody.setStatusCode(HttpStatus.OK.value());
+	    frozenFoodsBody.setStatus("SUCCESS");
+	    frozenFoodsBody.setData(frozenFoodsResponse);
+
+	    return ResponseEntity.ok(frozenFoodsBody);
 	}
+	
 	@GetMapping("/getAll")
 
 	public ResponseEntity<?> getAllFrozenFoods() {
@@ -109,7 +130,7 @@ public class FrozenFoodsController {
 	public ResponseEntity<ResponseBody<String>> updateFrozenFoods(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = frozenFoodsService.updatefrozenFoods(id, name, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

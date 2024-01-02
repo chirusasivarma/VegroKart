@@ -15,9 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.BeveragesResponse;
-import com.example.VegroKart.Entity.Fruits;
-import com.example.VegroKart.Entity.FruitsResponse;
-import com.example.VegroKart.Exception.FruitsIsNotFoundException;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Repository.BeveragesRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +27,7 @@ public class BeveragesService {
 	@Autowired
 	private BeveragesRepository beveragesRepository;
 
-	public Beverages saveBeverages(HttpServletRequest request, MultipartFile file, String beveragesName,int quantity, double price)
+	public Beverages saveBeverages(HttpServletRequest request, MultipartFile file, String beveragesName,String quantity, String price)
 			
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
@@ -140,7 +137,7 @@ public class BeveragesService {
 		});
 		return beveragesResponses;
 	}
-public String updatebeverages(long id, String beveragesName, int quantity, double price, MultipartFile file) throws IOException, SerialException, SQLException {
+public String updatebeverages(long id, String beveragesName, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<Beverages> optionalExistingBeverages = beveragesRepository.findById(id);
 

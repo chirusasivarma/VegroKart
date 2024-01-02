@@ -22,10 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Vegetables;
 import com.example.VegroKart.Entity.VegetablesResponse;
+import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.VegetablesService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/vegetables")
@@ -34,20 +36,40 @@ public class VegetablesController {
 	public VegetablesService vegetablesService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<Vegetables>> saveFruits(
-			@RequestParam("file") MultipartFile file, @RequestParam("vegetablesName") String vegetablesName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<VegetablesResponse>> saveVegetables(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("vegetablesName") String vegetablesName,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		Vegetables vegetables = vegetablesService.saveVegetables(request, file, vegetablesName,
-				quantity, price);
-		ResponseBody<Vegetables> vegetablesbody = new ResponseBody<Vegetables>();
-		vegetablesbody.setStatusCode(HttpStatus.OK.value());
-		vegetablesbody.setStatus("SUCCESS");
-		vegetablesbody.setData(vegetables);
-		return ResponseEntity.ok(vegetablesbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new ProductsIsNotFoundException("Image file is required");
+	    }
 
+	    Vegetables vegetables = vegetablesService.saveVegetables(request, file, vegetablesName, quantity, price);
+
+	    VegetablesResponse vegetablesResponse = new VegetablesResponse();
+	    vegetablesResponse.setId(vegetables.getId());
+	    vegetablesResponse.setVegetablesName(vegetables.getVegetablesName());
+	    vegetablesResponse.setQuantity(vegetables.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        vegetablesResponse.setImage("Image is present");
+	    } else {
+	        vegetablesResponse.setImage("");
+	    }
+
+	    vegetablesResponse.setPrice(vegetables.getPrice());
+
+	    ResponseBody<VegetablesResponse> vegetablesBody = new ResponseBody<>();
+	    vegetablesBody.setStatusCode(HttpStatus.OK.value());
+	    vegetablesBody.setStatus("SUCCESS");
+	    vegetablesBody.setData(vegetablesResponse);
+
+	    return ResponseEntity.ok(vegetablesBody);
 	}
+
 	@GetMapping("/allVegetables")
 
 	public ResponseEntity<?> getAllVegetables() {
@@ -108,7 +130,7 @@ public class VegetablesController {
 	public ResponseEntity<ResponseBody<String>> updateFruits(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("vegetablesName") String vegetablesName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = vegetablesService.updatevegetables(id, vegetablesName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

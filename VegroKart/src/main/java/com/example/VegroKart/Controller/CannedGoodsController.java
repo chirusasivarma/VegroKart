@@ -25,6 +25,7 @@ import com.example.VegroKart.Entity.CannedGoodsResponse;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.CannedGoodsService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/goods")
@@ -34,20 +35,40 @@ public class CannedGoodsController {
 	public CannedGoodsService cannedGoodsService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<CannedGoods>> saveCannedGoods(
-			@RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+	public ResponseEntity<ResponseBody<CannedGoodsResponse>> saveCannedGoods(
+	        @RequestParam("file") @Valid MultipartFile file,
+	        @RequestParam("name") String name,
+	        @RequestParam("quantity") String quantity,
+	        @RequestParam("price") String price,
+	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		CannedGoods cannedGoods = cannedGoodsService.saveCannedGoods(request, file, name,
-				quantity, price);
-		ResponseBody<CannedGoods> cannedGoodsbody = new ResponseBody<CannedGoods>();
-		cannedGoodsbody.setStatusCode(HttpStatus.OK.value());
-		cannedGoodsbody.setStatus("SUCCESS");
-		cannedGoodsbody.setData(cannedGoods);
-		return ResponseEntity.ok(cannedGoodsbody);
+	    if (file == null || file.isEmpty()) {
+	        throw new IllegalArgumentException("Image file is required");
+	    }
 
+	    CannedGoods cannedGoods = cannedGoodsService.saveCannedGoods(request, file, name, quantity, price);
+
+	    CannedGoodsResponse cannedGoodsResponse = new CannedGoodsResponse();
+	    cannedGoodsResponse.setId(cannedGoods.getId());
+	    cannedGoodsResponse.setName(cannedGoods.getName());
+	    cannedGoodsResponse.setQuantity(cannedGoods.getQuantity());
+
+	    if (file != null && !file.isEmpty()) {
+	        cannedGoodsResponse.setImage("Image is present");
+	    } else {
+	        cannedGoodsResponse.setImage("");
+	    }
+
+	    cannedGoodsResponse.setPrice(cannedGoods.getPrice());
+
+	    ResponseBody<CannedGoodsResponse> cannedGoodsBody = new ResponseBody<>();
+	    cannedGoodsBody.setStatusCode(HttpStatus.OK.value());
+	    cannedGoodsBody.setStatus("SUCCESS");
+	    cannedGoodsBody.setData(cannedGoodsResponse);
+
+	    return ResponseEntity.ok(cannedGoodsBody);
 	}
+
 	@GetMapping("/allGoods")
 
 	public ResponseEntity<?> getAllCannedGoods() {
@@ -108,7 +129,7 @@ public class CannedGoodsController {
 	public ResponseEntity<ResponseBody<String>> updateFruits(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("name") String name,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = cannedGoodsService.updatecannedGoods(id, name, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

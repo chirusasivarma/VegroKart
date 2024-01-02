@@ -11,7 +11,7 @@ public class PetFoodResponse {
 	
 	private Long id;
 	private String foodName;
-	private int quantity;
+	private String quantity;
 	private String image;
-	private double price;
+	private String price;
 }

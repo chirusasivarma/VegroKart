@@ -29,7 +29,7 @@ public class VegetablesService {
 	private VegetablesRepository vegetablesRepository;
 
 	public Vegetables saveVegetables(HttpServletRequest request, MultipartFile file, String vegetablesName,
-			int quantity, double price)
+			String quantity, String price)
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -140,7 +140,7 @@ public class VegetablesService {
 		return vegetablesResponses;
 	}
 	
-	public String updatevegetables(long id, String vegetablesName, int quantity, double price, MultipartFile file) throws IOException, SerialException, SQLException {
+	public String updatevegetables(long id, String vegetablesName, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<Vegetables> optionalExistingVegetables = vegetablesRepository.findById(id);
 

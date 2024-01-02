@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class DairyProductsResponse {
 	private Long id;
 	private String productName;
-	private int quantity;
+	private String quantity;
 	private String image;
-	private double price;
+	private String price;
 }
 
 
