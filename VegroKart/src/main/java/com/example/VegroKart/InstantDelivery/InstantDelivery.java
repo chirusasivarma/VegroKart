@@ -2,6 +2,8 @@ package com.example.VegroKart.InstantDelivery;
 
 import java.time.Instant;
 
+import com.example.VegroKart.Dto.Status;
+import com.example.VegroKart.Entity.BabyItems;
 import com.example.VegroKart.Entity.Beverages;
 import com.example.VegroKart.Entity.CannedGoods;
 import com.example.VegroKart.Entity.DairyProducts;
@@ -9,12 +11,15 @@ import com.example.VegroKart.Entity.FrozenFoods;
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.Meat;
 import com.example.VegroKart.Entity.PersonalCare;
+import com.example.VegroKart.Entity.PetFood;
 import com.example.VegroKart.Entity.SaucesAndOil;
 import com.example.VegroKart.Entity.Snacks;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,13 +62,13 @@ public class InstantDelivery {
 	    @JoinColumn(name = "meat_id")
 	    private Meat meat;
 
-//	    @ManyToOne
-//	    @JoinColumn(name = "baby_item_id")
-//	    private BabyItem babyItem;
-//	    
-//	    @ManyToOne
-//	    @JoinColumn(name = "pet_food_id")
-//	    private PetFood petFood;
+	    @ManyToOne
+	    @JoinColumn(name = "baby_item_id")
+	    private BabyItems babyItem;
+	    
+	    @ManyToOne
+	    @JoinColumn(name = "pet_food_id")
+	    private PetFood petFood;
 
 	    @ManyToOne
 	    @JoinColumn(name = "personal_care_id")
@@ -93,7 +98,8 @@ public class InstantDelivery {
 
 	    private int quantity;
 	    
-	    private String status;
+	    @Enumerated(EnumType.STRING)
+	    private Status status;
 	    
 	    private Instant deliveryTime;
 
