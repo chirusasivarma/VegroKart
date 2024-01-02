@@ -22,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Entity.FruitsResponse;
+import com.example.VegroKart.Exception.FruitsIsNotFoundException;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.FruitsService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/fruits")
@@ -34,20 +36,40 @@ public class FruitsController {
 	public FruitsService fruitsService;
 
 	@PostMapping("/save")
-	public ResponseEntity<ResponseBody<Fruits>> saveFruits(
-			@RequestParam("file") MultipartFile file, @RequestParam("fruitName") String fruitName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price,HttpServletRequest request)
-			throws IOException, SerialException, SQLException {
+    public ResponseEntity<ResponseBody<FruitsResponse>> saveFruits(
+            @RequestParam("file") @Valid MultipartFile file,
+            @RequestParam("fruitName") String fruitName,
+            @RequestParam("quantity") String quantity,
+            @RequestParam("price") String price,
+            HttpServletRequest request) throws IOException, SerialException, SQLException {
 
-		Fruits fruits = fruitsService.saveFruits(request, file, fruitName,
-				quantity, price);
-		ResponseBody<Fruits> fruitsbody = new ResponseBody<Fruits>();
-		fruitsbody.setStatusCode(HttpStatus.OK.value());
-		fruitsbody.setStatus("SUCCESS");
-		fruitsbody.setData(fruits);
-		return ResponseEntity.ok(fruitsbody);
+        if (file == null || file.isEmpty()) {
+            throw new FruitsIsNotFoundException("Image file is required");
+        }
 
-	}
+        Fruits fruits = fruitsService.saveFruits(request, file, fruitName, quantity, price);
+
+        FruitsResponse fruitsResponse = new FruitsResponse();
+        fruitsResponse.setId(fruits.getId());
+        fruitsResponse.setFruitName(fruits.getFruitName());
+        fruitsResponse.setQuantity(fruits.getQuantity());
+
+        if (file != null && !file.isEmpty()) {
+            fruitsResponse.setImage("Image uploaded");
+        } else {
+            fruitsResponse.setImage("");
+        }
+
+        fruitsResponse.setPrice(fruits.getPrice());
+
+        ResponseBody<FruitsResponse> fruitsbody = new ResponseBody<>();
+        fruitsbody.setStatusCode(HttpStatus.OK.value());
+        fruitsbody.setStatus("SUCCESS");
+        fruitsbody.setData(fruitsResponse);
+
+        return ResponseEntity.ok(fruitsbody);
+    }
+	
 	@GetMapping("/allFruits")
 
 	public ResponseEntity<?> getAllFruits() {
@@ -108,7 +130,7 @@ public class FruitsController {
 	public ResponseEntity<ResponseBody<String>> updateFruits(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("fruitName") String fruitName,
-			@RequestParam("quantity") int quantity, @RequestParam("price") double price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
 		String message = fruitsService.updatefruits(id, fruitName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();
@@ -126,6 +148,7 @@ public class FruitsController {
 	            responsebody.setStatus("SUCCESS");
 	            responsebody.setData("Fruits with ID " + id + " deleted successfully.");
 	            return ResponseEntity.ok(responsebody);
+	            
 	        } 
 	}
 
