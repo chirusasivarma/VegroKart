@@ -110,7 +110,7 @@ public class InstantDeliveryService {
                 instantDelivery.setUser(user);
                 instantDelivery.setQuantity(quantity);
                 instantDelivery.setStatus(Status.Ontheway);
-                instantDelivery.setDeliveryTime(Instant.now());
+                instantDelivery.setOrderedTime(Instant.now());
 
                 switch (categoryName) {
                     case "Fruit":
@@ -212,7 +212,7 @@ public class InstantDeliveryService {
         response.setMyAddress(instantDelivery.getUser().getMyAddress());
         response.setQuantity(instantDelivery.getQuantity());
         response.setStatus(instantDelivery.getStatus());
-        response.setDeliveryTime(instantDelivery.getDeliveryTime());
+        response.setOrdredTime(instantDelivery.getOrderedTime());
 
         setBookedItemAndCategory(instantDelivery, response);
 
@@ -273,8 +273,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
-            response.setDeliveryTime(instantDelivery.getDeliveryTime());
-
+            response.setOrdredTime(instantDelivery.getOrderedTime());
             setBookedItemAndCategory(instantDelivery, response);
 
             responses.add(response);
@@ -302,7 +301,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
-            response.setDeliveryTime(instantDelivery.getDeliveryTime());
+            response.setOrdredTime(instantDelivery.getOrderedTime());
 
             setBookedItemAndCategory(instantDelivery, response);
 
@@ -311,6 +310,7 @@ public class InstantDeliveryService {
 
         return responses;
     }
+
 
 
 

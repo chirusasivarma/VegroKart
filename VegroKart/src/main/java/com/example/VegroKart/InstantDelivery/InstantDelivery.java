@@ -105,7 +105,7 @@ public class InstantDelivery {
 	    @Enumerated(EnumType.STRING)
 	    private Status status;
 	    
-	    private Instant deliveryTime;
+	    private Instant orderedTime;
 
 
 }

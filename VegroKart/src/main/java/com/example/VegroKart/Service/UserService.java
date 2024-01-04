@@ -410,7 +410,7 @@ public class UserService {
 	                if (user.getImage() != null) {
 	                    return user.getImage().getBytes(1, (int) user.getImage().length());
 	                }
-	            } catch (SQLException e) {
+	            } catch (SQLException e) { 
 	                e.printStackTrace();
 	            }
 	        }
@@ -427,9 +427,7 @@ public class UserService {
 	  }
 	  
 	  
-	  public Optional<User> getUserById(Long userId) {
-	        return userRepository.findById(userId);
-	    }
+	
 
 	    public Optional<User> getUserWithInstantDelivery(Long userId) {
 	        return userRepository.findByIdWithInstantDelivery(userId);

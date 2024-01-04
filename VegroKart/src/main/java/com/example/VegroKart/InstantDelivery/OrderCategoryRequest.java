@@ -1,7 +1,5 @@
 package com.example.VegroKart.InstantDelivery;
 
-
-
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -16,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class OrderCategoryRequest {
 
-	 private String categoryName;
+	private String categoryName;
 	
     private List<OrderItemRequest> items;
 }

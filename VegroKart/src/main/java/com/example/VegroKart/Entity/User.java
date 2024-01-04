@@ -1,10 +1,10 @@
 package com.example.VegroKart.Entity;
 
 import java.sql.Blob;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.example.VegroKart.InstantDelivery.InstantDelivery;
+import com.example.VegroKart.MorningDelivery.MorningDelivery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -70,7 +70,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<InstantDelivery> instantDelivery;
 
-
-    
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<MorningDelivery> morningDelivery;
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MorningDelivery> morningDeliveries; 
 
 }
