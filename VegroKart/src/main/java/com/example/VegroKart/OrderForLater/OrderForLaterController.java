@@ -22,6 +22,17 @@ public class OrderForLaterController {
 	
 	@Autowired
     private OderForLaterService orderForLaterService;
+	
+	@PostMapping("/placeOrder/{userId}")
+    public ResponseEntity<ResponseBody<?>> placeOrder(@PathVariable Long userId,
+                                            @RequestBody List<OrderCategoryRequest> orderCategories) {
+        orderForLaterService.placeOrder(userId, orderCategories);
+        ResponseBody<String> body=new ResponseBody<String>();
+        body.setStatusCode(HttpStatus.OK.value());
+        body.setStatus("SUCCESS");
+        body.setData("Order placed successfully");
+        return new ResponseEntity<>(body,HttpStatus.OK); 
+    }
 
     @GetMapping("/all")
     public ResponseEntity<ResponseBody<List<OrderForLater>>> getAllOderForLater() {
@@ -32,7 +43,7 @@ public class OrderForLaterController {
         body.setData(instantDeliveries);
         return ResponseEntity.status(HttpStatus.OK).body(body);
     }
-
+    
     @GetMapping("/user/{userId}")
     public ResponseEntity<ResponseBody<List<BookingDetailsResponse>>> getOderForLaterByUser(@PathVariable Long userId) {
         List<BookingDetailsResponse> responses = orderForLaterService.getBookingDetailsByUserId(userId);
@@ -43,17 +54,6 @@ public class OrderForLaterController {
         return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 
-    @PostMapping("/place-order/{userId}")
-    public ResponseEntity<ResponseBody<?>> placeOrder(@PathVariable Long userId,
-                                            @RequestBody List<OrderCategoryRequest> orderCategories) {
-        orderForLaterService.placeOrder(userId, orderCategories);
-        ResponseBody<String> body=new ResponseBody<String>();
-        body.setStatusCode(HttpStatus.OK.value());
-        body.setStatus("SUCCESS");
-        body.setData("Order placed successfully");
-        return new ResponseEntity<>(body,HttpStatus.OK); 
-    }
-    
     @PutMapping("/delivered/{id}")
     public ResponseEntity<ResponseBody<String>> approveorderForLater(@PathVariable Long id) {
         String result = orderForLaterService.approveorderForLater(id);
