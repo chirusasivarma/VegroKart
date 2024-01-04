@@ -2,7 +2,6 @@ package com.example.VegroKart.MorningDelivery;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import com.example.VegroKart.Dto.Status;
@@ -33,7 +32,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -113,7 +111,6 @@ public class MorningDelivery {
     @ElementCollection
     @CollectionTable(name = "morning_delivery_dates", joinColumns = @JoinColumn(name = "morning_delivery_id"))
     @Column(name = "delivery_date")
-//    @FutureOrPresent(message = "All dates in the list must be in the future or present")
     private List<LocalDate> deliveryDates;
     
     @Column(name = "ordered_time")
