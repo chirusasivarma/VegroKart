@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.example.VegroKart.InstantDelivery.InstantDelivery;
 import com.example.VegroKart.MorningDelivery.MorningDelivery;
+import com.example.VegroKart.OrderForLater.OrderForLater;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -70,9 +70,13 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<InstantDelivery> instantDelivery;
 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<MorningDelivery> morningDelivery;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MorningDelivery> morningDeliveries; 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderForLater> orderForLater;
+
+
 
 }

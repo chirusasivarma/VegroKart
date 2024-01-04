@@ -3,7 +3,8 @@ package com.example.VegroKart.Dto;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-
+import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BookingDetailsResponse {
+	
 	private Long id;
     private String name;
     private String mobileNumber;
@@ -21,5 +23,8 @@ public class BookingDetailsResponse {
     private Status status;
     private Instant ordredTime;
     private List<LocalDate> deliveryDates;
+    private Instant deliveryTime;
+	private LocalDateTime orderDateTime;
+	private Date deliveryDate;
 		
 }
