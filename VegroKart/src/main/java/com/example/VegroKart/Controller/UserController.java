@@ -54,7 +54,7 @@ public class UserController {
 	@PostMapping("/save")
 	public ResponseEntity<ResponseBody<?>> saveUser(@Valid
 			@RequestParam("file") MultipartFile file,@RequestParam("name") String name,@RequestParam("mobileNumber")String mobileNumber,
-			@RequestParam("emailAddress")String emailAddress,@RequestParam("myAddress") String myAddress, @RequestParam("password")String password ) throws SerialException, SQLException, IOException{
+			@RequestParam("emailAddress")String emailAddress,@RequestParam("myAddress") List<MyAddress> myAddress, @RequestParam("password")String password ) throws SerialException, SQLException, IOException{
 	User users=	userService.saveUser(file, name, mobileNumber, myAddress, emailAddress, password);
 		ResponseBody<User> body=new ResponseBody<User>();
 		body.setStatusCode(HttpStatus.OK.value());
@@ -213,7 +213,7 @@ public class UserController {
 		 
 		 @PutMapping("/updateAddress/{id}")
 		 public ResponseEntity<ResponseBody<User>> updateUserById(@PathVariable("id") long id,
-				 @RequestParam("myAddress") String myAddress) throws SerialException, IOException, SQLException{
+				 @RequestParam("myAddress") List<MyAddress> myAddress) throws SerialException, IOException, SQLException{
 			 User user=userService.updateUser(id, myAddress);
 			 ResponseBody<User> body= new ResponseBody<User>();
 			 body.setStatusCode(HttpStatus.OK.value());
