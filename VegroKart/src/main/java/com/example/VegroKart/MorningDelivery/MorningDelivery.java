@@ -2,6 +2,7 @@ package com.example.VegroKart.MorningDelivery;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.VegroKart.Dto.Status;
@@ -113,8 +114,8 @@ public class MorningDelivery {
     @Column(name = "delivery_date")
     private List<LocalDate> deliveryDates;
     
-    @Column(name = "ordered_time")
-    private Instant orderedTime;
+    @Column(name = "Ordered_Date_Time")
+    private LocalDateTime orderDateTime;
 
 
 

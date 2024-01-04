@@ -1,6 +1,7 @@
 package com.example.VegroKart.InstantDelivery;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class InstantDeliveryService {
                 instantDelivery.setUser(user);
                 instantDelivery.setQuantity(quantity);
                 instantDelivery.setStatus(Status.Ontheway);
-                instantDelivery.setOrderedTime(Instant.now());
+                instantDelivery.setOrderDateTime(LocalDateTime.now());
 
                 switch (categoryName) {
                     case "Fruit":
@@ -212,8 +213,7 @@ public class InstantDeliveryService {
         response.setMyAddress(instantDelivery.getUser().getMyAddress());
         response.setQuantity(instantDelivery.getQuantity());
         response.setStatus(instantDelivery.getStatus());
-        response.setOrdredTime(instantDelivery.getOrderedTime());
-
+        response.setOrderDateTime(instantDelivery.getOrderDateTime());
         setBookedItemAndCategory(instantDelivery, response);
 
         return response;
@@ -273,7 +273,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
-            response.setOrdredTime(instantDelivery.getOrderedTime());
+            response.setOrderDateTime(instantDelivery.getOrderDateTime());
             setBookedItemAndCategory(instantDelivery, response);
 
             responses.add(response);
@@ -301,7 +301,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
-            response.setOrdredTime(instantDelivery.getOrderedTime());
+            response.setOrderDateTime(instantDelivery.getOrderDateTime());
 
             setBookedItemAndCategory(instantDelivery, response);
 

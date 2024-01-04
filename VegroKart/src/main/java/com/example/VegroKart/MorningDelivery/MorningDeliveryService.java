@@ -2,6 +2,7 @@ package com.example.VegroKart.MorningDelivery;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -109,28 +110,27 @@ public class MorningDeliveryService {
 	    User user = userRepository.findById(userId)
 	            .orElseThrow(() -> new UserIsNotFoundException("Invalid user ID"));
 
-        List<LocalDate> deliveryDates = morningOrderRequest.getDeliveryDates();
+	    List<LocalDate> deliveryDates = morningOrderRequest.getDeliveryDates();
 
-        for (LocalDate deliveryDate : deliveryDates) {
-            Instant deliveryInstant = deliveryDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+	    for (LocalDate deliveryDate : deliveryDates) {
+	        Instant deliveryInstant = deliveryDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
 
-            List<OrderCategoryRequest> orderCategories = morningOrderRequest.getOrderCategories();
+	        List<OrderCategoryRequest> orderCategories = morningOrderRequest.getOrderCategories();
 
-            for (OrderCategoryRequest orderCategory : orderCategories) {
-                String categoryName = orderCategory.getCategoryName();
-                List<OrderItemRequest> items = orderCategory.getItems();
+	        for (OrderCategoryRequest orderCategory : orderCategories) {
+	            String categoryName = orderCategory.getCategoryName();
+	            List<OrderItemRequest> items = orderCategory.getItems();
 
-                for (OrderItemRequest orderItem : items) {
-                    Long entityId = orderItem.getItemId();
-                    int quantity = orderItem.getQuantity();
+	            MorningDelivery morningDelivery = new MorningDelivery();
+	            morningDelivery.setUser(user);
+	            morningDelivery.setDeliveryDates(deliveryDates);
+	            morningDelivery.setOrderDateTime(LocalDateTime.now());
 
-                    MorningDelivery morningDelivery = new MorningDelivery();
-                    morningDelivery.setUser(user);
-                    
-                    morningDelivery.setOrderedTime(Instant.now());
-                    morningDelivery.setQuantity(quantity);
-                    morningDelivery.setStatus(Status.Ontheway);
-
+	            for (OrderItemRequest orderItem : items) {
+	                Long entityId = orderItem.getItemId();
+	                int quantity = orderItem.getQuantity();
+	                morningDelivery.setQuantity(quantity);
+	                morningDelivery.setStatus(Status.Ontheway);
 
 	                    switch (categoryName) {
 	                    case "Fruit":
@@ -203,6 +203,8 @@ public class MorningDeliveryService {
 	        }
 	    }
 
+
+
     public List<BookingDetailsResponse> getAllBookingDetails() {
         List<MorningDelivery> allMorningDeliveries = morningDeliveryRepository.findAll();
 
@@ -215,7 +217,8 @@ public class MorningDeliveryService {
             response.setMyAddress(morningDelivery.getUser().getMyAddress());
             response.setQuantity(morningDelivery.getQuantity());
             response.setStatus(morningDelivery.getStatus());
-            response.setOrdredTime(morningDelivery.getOrderedTime());
+            response.setDeliveryDates(morningDelivery.getDeliveryDates());
+            response.setOrderDateTime(morningDelivery.getOrderDateTime());
             setMorningDeliveryItemAndCategory(morningDelivery, response);
             responses.add(response);
         }
@@ -278,7 +281,7 @@ public class MorningDeliveryService {
 	        response.setMyAddress(morningDelivery.getUser().getMyAddress());
 	        response.setQuantity(morningDelivery.getQuantity());
 	        response.setStatus(morningDelivery.getStatus());
-	        response.setOrdredTime(morningDelivery.getOrderedTime());
+	        response.setOrderDateTime(morningDelivery.getOrderDateTime());
 	        response.setDeliveryDates(morningDelivery.getDeliveryDates());
 	        setMorningDeliveryItemAndCategory(morningDelivery, response);
 	        return response;

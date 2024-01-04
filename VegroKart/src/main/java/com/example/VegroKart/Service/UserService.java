@@ -23,6 +23,7 @@ import com.example.VegroKart.Dto.OtpResponseDto;
 import com.example.VegroKart.Dto.Registration;
 import com.example.VegroKart.Dto.ResetPassword;
 import com.example.VegroKart.Dto.UserDto;
+import com.example.VegroKart.Entity.MyAddress;
 import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
 import com.example.VegroKart.Helper.EncryptionService;
@@ -53,7 +54,7 @@ public class UserService {
 
 	
 	//save user details
-	public User saveUser(MultipartFile file,String name,String mobileNumber,String myAddress, String emailAddress, String password) throws SerialException, SQLException, IOException {
+	public User saveUser(MultipartFile file,String name,String mobileNumber,List<MyAddress> myAddress, String emailAddress, String password) throws SerialException, SQLException, IOException {
 		Optional<User> emailOptional=userRepository.findByEmailAddress(emailAddress);
 		if (emailOptional.isPresent()) {
 			throw new UserIsNotFoundException("user is already existed with this email addres .");
@@ -265,7 +266,9 @@ public class UserService {
 		        userDto.setEmailAddress(user.getEmailAddress());
 		        userDto.setMobileNumber(user.getMobileNumber());
 		        userDto.setMyAddress(user.getMyAddress());
-		        user.setInstantDelivery(user.getInstantDelivery());
+		        userDto.setInstantDelivery(user.getInstantDelivery());
+				userDto.setOrderForLater(user.getOrderForLater());
+				userDto.setMorningDeliveries(user.getMorningDeliveries());
 		        userDto.setPassword(user.getPassword());
 		        if (user.getImage() != null) {
 		            try {
@@ -306,7 +309,9 @@ public class UserService {
 		userDto.setName(user.getName());
 		userDto.setEmailAddress(user.getEmailAddress());
 		userDto.setMobileNumber(user.getMobileNumber());
-		user.setInstantDelivery(user.getInstantDelivery());
+		userDto.setInstantDelivery(user.getInstantDelivery());
+		userDto.setOrderForLater(user.getOrderForLater());
+		userDto.setMorningDeliveries(user.getMorningDeliveries());
 		userDto.setMyAddress(user.getMyAddress());
 		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
 		  if (user.getImage() != null) {
@@ -341,6 +346,9 @@ public class UserService {
 		userDto.setName(user.getName());
 		userDto.setEmailAddress(user.getEmailAddress());
 		userDto.setMobileNumber(user.getMobileNumber());
+		userDto.setInstantDelivery(user.getInstantDelivery());
+		userDto.setOrderForLater(user.getOrderForLater());
+		userDto.setMorningDeliveries(user.getMorningDeliveries());
 		userDto.setMyAddress(user.getMyAddress());
 		userDto.setPassword(encryptionService.encryptPassword(user.getPassword()));
 		  if (user.getImage() != null) {
@@ -390,7 +398,7 @@ public class UserService {
 	    }
 	  
 	  @Transactional
-	    public User updateUser(long id,String myAddress) throws IOException, SerialException, SQLException {
+	    public User updateUser(long id,List<MyAddress> myAddress) throws IOException, SerialException, SQLException {
 	        Optional<User> optionalExistingUser = userRepository.findById(id);
 	        if (optionalExistingUser.isEmpty()) {
 	            throw new UserIsNotFoundException("user not found with id :" + id);
