@@ -4,15 +4,16 @@ import java.sql.Blob;
 import java.util.List;
 
 import com.example.VegroKart.InstantDelivery.InstantDelivery;
+import com.example.VegroKart.MorningDelivery.MorningDelivery;
 import com.example.VegroKart.OrderForLater.OrderForLater;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -55,25 +56,29 @@ public class User {
     @JsonIgnore
     private Blob image;
     
- //   @NotBlank(message = "Address cannot be blank")
+//    @NotBlank(message = "Address cannot be blank")
+//    @JsonIgnore
+//    private String myAddress;
+    
+    
     @JsonIgnore
-    private String myAddress;
-    
-//    
-//    
-//    @OneToMany(targetEntity = MyAddress.class , cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
-//    @JoinColumn(referencedColumnName = "id" , name = "user-Id")
-//    private List<MyAddress> myAddress;
-//	
+    @OneToMany(targetEntity = MyAddress.class , cascade = CascadeType.ALL ,fetch = FetchType.EAGER)
+    @JoinColumn(referencedColumnName = "id" , name = "user-Id")
+    private List<MyAddress> myAddress;
+	
 
-    
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<InstantDelivery> instantDelivery;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MorningDelivery> morningDeliveries; 
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderForLater> orderForLater;
 
 
-    
 
 }

@@ -1,6 +1,7 @@
 package com.example.VegroKart.InstantDelivery;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import com.example.VegroKart.Dto.Status;
 import com.example.VegroKart.Entity.BabyItems;
@@ -105,7 +106,7 @@ public class InstantDelivery {
 	    @Enumerated(EnumType.STRING)
 	    private Status status;
 	    
-	    private Instant deliveryTime;
+	    private LocalDateTime orderDateTime;
 
 
 }
