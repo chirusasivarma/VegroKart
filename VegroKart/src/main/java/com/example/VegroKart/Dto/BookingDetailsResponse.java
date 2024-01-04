@@ -1,6 +1,8 @@
 package com.example.VegroKart.Dto;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.example.VegroKart.Entity.User;
 
@@ -20,5 +22,7 @@ public class BookingDetailsResponse {
     private int quantity;
     private Status status;
     private Instant deliveryTime;
+	private LocalDateTime orderDateTime;
+	private Date deliveryDate;
 		
 }
