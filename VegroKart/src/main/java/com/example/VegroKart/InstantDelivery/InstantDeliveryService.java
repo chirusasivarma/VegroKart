@@ -99,6 +99,8 @@ public class InstantDeliveryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserIsNotFoundException("Invalid user ID"));
 
+        double totalOrderPrice = 0.0; 
+
         for (OrderCategoryRequest orderCategory : orderCategories) {
             String categoryName = orderCategory.getCategoryName();
             List<OrderItemRequest> items = orderCategory.getItems();
@@ -110,84 +112,103 @@ public class InstantDeliveryService {
                 InstantDelivery instantDelivery = new InstantDelivery();
                 instantDelivery.setUser(user);
                 instantDelivery.setQuantity(quantity);
-                instantDelivery.setStatus(Status.Ontheway);
+                instantDelivery.setStatus(Status.approvalPending);
                 instantDelivery.setOrderDateTime(LocalDateTime.now());
+
+                double itemTotalPrice = 0.0;
 
                 switch (categoryName) {
                     case "Fruit":
                         Fruits fruit = fruitRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Fruit ID"));
                         instantDelivery.setFruit(fruit);
+                        itemTotalPrice = fruit.getPrice() * quantity;
                         break;
                     case "Snack":
                         Snacks snack = snackRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Snack ID"));
                         instantDelivery.setSnack(snack);
+                        itemTotalPrice = snack.getPrice() * quantity;
                         break;
                     case "Vegetable":
                         Vegetables vegetable = vegetableRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Vegetable ID"));
                         instantDelivery.setVegetable(vegetable);
+                        itemTotalPrice =vegetable.getPrice() * quantity;
                         break;
                     case "Meat":
                         Meat meat = meatRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Meat ID"));
                         instantDelivery.setMeat(meat);
+                        itemTotalPrice = meat.getPrice() * quantity;
                         break;
                     case "Beverage":
                         Beverages beverage = beverageRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Beverage ID"));
                         instantDelivery.setBeverage(beverage);
+                        itemTotalPrice = beverage.getPrice() * quantity;
                         break;
                     case "DairyProduct":
                         DairyProducts dairyProduct = dairyProductRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid DairyProduct ID"));
                         instantDelivery.setDairyProduct(dairyProduct);
+                        instantDelivery.setTotalPrice(dairyProduct.getPrice() * quantity);
                         break;
                     case "CannedGoods":
                         CannedGoods cannedGoods = cannedGoodsRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid CannedGoods ID"));
                         instantDelivery.setCannedGood(cannedGoods);
+                        instantDelivery.setTotalPrice(cannedGoods.getPrice() * quantity);
                         break;
                     case "FrozenFoods":
                         FrozenFoods frozenFoods = frozenFoodsRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid FrozenFoods ID"));
                         instantDelivery.setFrozenFood(frozenFoods);
+                        instantDelivery.setTotalPrice(frozenFoods.getPrice() * quantity);
                         break;
                     case "PersonalCare":
                         PersonalCare personalCare = personalCareRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid PersonalCare ID"));
                         instantDelivery.setPersonalCare(personalCare);
+                        instantDelivery.setTotalPrice(personalCare.getPrice() * quantity);
                         break;
                     case "SaucesAndOil":
                         SaucesAndOil saucesAndOil = saucesAndOilRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
                         instantDelivery.setSaucesAndOils(saucesAndOil);
+                        instantDelivery.setTotalPrice(saucesAndOil.getPrice() * quantity);
                         break;
                     case "babyItem":
                         BabyItems babyItem = babyItemsRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
                         instantDelivery.setBabyItem(babyItem);
+                        instantDelivery.setTotalPrice(babyItem.getPrice() * quantity);
                         break;
                     case "petFood":
                         PetFood petFood = petFoodRepository.findById(entityId)
                                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
                         instantDelivery.setPetFood(petFood);
+                        instantDelivery.setTotalPrice(petFood.getPrice() * quantity);
                         break;
-   
-                    
+                }
+                        totalOrderPrice += itemTotalPrice; 
+
+                        instantDelivery.setTotalPrice(itemTotalPrice);
+                        instantDeliveryRepository.save(instantDelivery);
+                    }
                 }
 
-                instantDeliveryRepository.save(instantDelivery);
-            }
-        }
-    }
+               
+                System.out.println("Total Order Price: " + totalOrderPrice);
+            
     
+}
     
+     
     
     public String approveinstantDelivery(Long id) {
 		InstantDelivery instantDelivery = instantDeliveryRepository.findById(id).get();
-		instantDelivery.setStatus(Status.Delivered);
+		instantDelivery.setStatus(Status.orderplacedsuccessfully);
 		instantDeliveryRepository.save(instantDelivery);
 		return "Order Deliverd";
     }
@@ -213,6 +234,7 @@ public class InstantDeliveryService {
         response.setMyAddress(instantDelivery.getUser().getMyAddress());
         response.setQuantity(instantDelivery.getQuantity());
         response.setStatus(instantDelivery.getStatus());
+        response.setTotalPrice(instantDelivery.getTotalPrice());
         response.setOrderDateTime(instantDelivery.getOrderDateTime());
         setBookedItemAndCategory(instantDelivery, response);
 
@@ -273,6 +295,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
+            response.setTotalPrice(instantDelivery.getTotalPrice());
             response.setOrderDateTime(instantDelivery.getOrderDateTime());
             setBookedItemAndCategory(instantDelivery, response);
 
@@ -301,6 +324,7 @@ public class InstantDeliveryService {
             response.setMyAddress(instantDelivery.getUser().getMyAddress());
             response.setQuantity(instantDelivery.getQuantity());
             response.setStatus(instantDelivery.getStatus());
+            response.setTotalPrice(instantDelivery.getTotalPrice());
             response.setOrderDateTime(instantDelivery.getOrderDateTime());
 
             setBookedItemAndCategory(instantDelivery, response);

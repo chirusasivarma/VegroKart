@@ -30,7 +30,7 @@ public class FrozenFoodsService {
 	private FrozenFoodsRepository frozenFoodsRepository;
 
 	public FrozenFoods saveFrozenFoods(HttpServletRequest request, MultipartFile file, String name,
-			String quantity, String price)
+			String quantity, Double price)
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -141,7 +141,7 @@ public class FrozenFoodsService {
 		return frozenFoodsResponses;
 	}
 	
-	public String updatefrozenFoods(long id, String name, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
+	public String updatefrozenFoods(long id, String name, String quantity, Double price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<FrozenFoods> optionalExistingFrozenFoods = frozenFoodsRepository.findById(id);
 

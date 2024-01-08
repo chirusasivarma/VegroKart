@@ -12,5 +12,5 @@ public class SaucesAndOilResponse {
 	private String name;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }

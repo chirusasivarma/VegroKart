@@ -2,6 +2,7 @@ package com.example.VegroKart.MorningDelivery;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.VegroKart.Dto.Status;
@@ -30,7 +31,7 @@ public class MorningBookingDetailsResponse {
 
     private Status status;
 
-    private Instant orderedTime;
+    private LocalDateTime orderDateTime;
 
     private List<LocalDate> deliveryDates;
 }

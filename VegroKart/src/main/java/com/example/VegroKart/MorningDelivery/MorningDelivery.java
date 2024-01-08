@@ -33,6 +33,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -112,10 +113,12 @@ public class MorningDelivery {
     @ElementCollection
     @CollectionTable(name = "morning_delivery_dates", joinColumns = @JoinColumn(name = "morning_delivery_id"))
     @Column(name = "delivery_date")
-    private List<LocalDate> deliveryDates;
+    private List<@FutureOrPresent LocalDate> deliveryDates;
     
     @Column(name = "Ordered_Date_Time")
     private LocalDateTime orderDateTime;
+    
+    private double totalPrice;
 
 
 

@@ -31,6 +31,7 @@ import com.example.VegroKart.Exception.FruitsIsNotFoundException;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Exception.SnacksIsNotFoundException;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
+import com.example.VegroKart.InstantDelivery.InstantDelivery;
 import com.example.VegroKart.InstantDelivery.OrderCategoryRequest;
 import com.example.VegroKart.InstantDelivery.OrderItemRequest;
 import com.example.VegroKart.Repository.BabyItemsRepository;
@@ -110,6 +111,7 @@ public class MorningDeliveryService {
 	    User user = userRepository.findById(userId)
 	            .orElseThrow(() -> new UserIsNotFoundException("Invalid user ID"));
 
+	    double totalOrderPrice = 0.0; 
 	    List<LocalDate> deliveryDates = morningOrderRequest.getDeliveryDates();
 
 	    for (LocalDate deliveryDate : deliveryDates) {
@@ -130,79 +132,95 @@ public class MorningDeliveryService {
 	                Long entityId = orderItem.getItemId();
 	                int quantity = orderItem.getQuantity();
 	                morningDelivery.setQuantity(quantity);
-	                morningDelivery.setStatus(Status.Ontheway);
+	                morningDelivery.setStatus(Status.approvalPending);
 
-	                    switch (categoryName) {
-	                    case "Fruit":
-	                        Fruits fruit = fruitRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Fruit ID"));
-	                        morningDelivery.setFruit(fruit);
-	                        break;
-	                    case "Snack":
-	                        Snacks snack = snackRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Snack ID"));
-	                        morningDelivery.setSnack(snack);
-	                        break;
-	                    case "Vegetable":
-	                        Vegetables vegetable = vegetableRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Vegetable ID"));
-	                        morningDelivery.setVegetable(vegetable);
-	                        break;
-	                    case "Meat":
-	                        Meat meat = meatRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Meat ID"));
-	                        morningDelivery.setMeat(meat);
-	                        break;
-	                    case "Beverage":
-	                        Beverages beverage = beverageRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Beverage ID"));
-	                        morningDelivery.setBeverage(beverage);
-	                        break;
-	                    case "DairyProduct":
-	                        DairyProducts dairyProduct = dairyProductRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid DairyProduct ID"));
-	                        morningDelivery.setDairyProduct(dairyProduct);
-	                        break;
-	                    case "CannedGoods":
-	                        CannedGoods cannedGoods = cannedGoodsRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid CannedGoods ID"));
-	                        morningDelivery.setCannedGood(cannedGoods);
-	                        break;
-	                    case "FrozenFoods":
-	                        FrozenFoods frozenFoods = frozenFoodsRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid FrozenFoods ID"));
-	                        morningDelivery.setFrozenFood(frozenFoods);
-	                        break;
-	                    case "PersonalCare":
-	                        PersonalCare personalCare = personalCareRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid PersonalCare ID"));
-	                        morningDelivery.setPersonalCare(personalCare);
-	                        break;
-	                    case "SaucesAndOil":
-	                        SaucesAndOil saucesAndOil = saucesAndOilRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
-	                        morningDelivery.setSaucesAndOils(saucesAndOil);
-	                        break;
-	                    case "babyItem":
-	                        BabyItems babyItem = babyItemsRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
-	                        morningDelivery.setBabyItem(babyItem);
-	                        break;
-	                    case "petFood":
-	                        PetFood petFood = petFoodRepository.findById(entityId)
-	                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
-	                        morningDelivery.setPetFood(petFood);
-	                        break;
+	                double itemTotalPrice = 0.0;
+	                switch (categoryName) {
+                    case "Fruit":
+                        Fruits fruit = fruitRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Fruit ID"));
+                        morningDelivery.setFruit(fruit);
+                        itemTotalPrice = fruit.getPrice() * quantity;
+                        break;
+                    case "Snack":
+                        Snacks snack = snackRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Snack ID"));
+                        morningDelivery.setSnack(snack);
+                        itemTotalPrice = snack.getPrice() * quantity;
+                        break;
+                    case "Vegetable":
+                        Vegetables vegetable = vegetableRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Vegetable ID"));
+                        morningDelivery.setVegetable(vegetable);
+                        itemTotalPrice =vegetable.getPrice() * quantity;
+                        break;
+                    case "Meat":
+                        Meat meat = meatRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Meat ID"));
+                        morningDelivery.setMeat(meat);
+                        itemTotalPrice = meat.getPrice() * quantity;
+                        break;
+                    case "Beverage":
+                        Beverages beverage = beverageRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Beverage ID"));
+                        morningDelivery.setBeverage(beverage);
+                        itemTotalPrice = beverage.getPrice() * quantity;
+                        break;
+                    case "DairyProduct":
+                        DairyProducts dairyProduct = dairyProductRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid DairyProduct ID"));
+                        morningDelivery.setDairyProduct(dairyProduct);
+                        morningDelivery.setTotalPrice(dairyProduct.getPrice() * quantity);
+                        break;
+                    case "CannedGoods":
+                        CannedGoods cannedGoods = cannedGoodsRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid CannedGoods ID"));
+                        morningDelivery.setCannedGood(cannedGoods);
+                        morningDelivery.setTotalPrice(cannedGoods.getPrice() * quantity);
+                        break;
+                    case "FrozenFoods":
+                        FrozenFoods frozenFoods = frozenFoodsRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid FrozenFoods ID"));
+                        morningDelivery.setFrozenFood(frozenFoods);
+                        morningDelivery.setTotalPrice(frozenFoods.getPrice() * quantity);
+                        break;
+                    case "PersonalCare":
+                        PersonalCare personalCare = personalCareRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid PersonalCare ID"));
+                        morningDelivery.setPersonalCare(personalCare);
+                        morningDelivery.setTotalPrice(personalCare.getPrice() * quantity);
+                        break;
+                    case "SaucesAndOil":
+                        SaucesAndOil saucesAndOil = saucesAndOilRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
+                        morningDelivery.setSaucesAndOils(saucesAndOil);
+                        morningDelivery.setTotalPrice(saucesAndOil.getPrice() * quantity);
+                        break;
+                    case "babyItem":
+                        BabyItems babyItem = babyItemsRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
+                        morningDelivery.setBabyItem(babyItem);
+                        morningDelivery.setTotalPrice(babyItem.getPrice() * quantity);
+                        break;
+                    case "petFood":
+                        PetFood petFood = petFoodRepository.findById(entityId)
+                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
+                        morningDelivery.setPetFood(petFood);
+                        morningDelivery.setTotalPrice(petFood.getPrice() * quantity);
+                        break;
+                }
+	                totalOrderPrice += itemTotalPrice; 
 
-	                        default:
-	                            throw new ProductsIsNotFoundException("Invalid category");
-	                    }
-	                    morningDeliveryRepository.save(morningDelivery);
-	                }
-	            }
-	        }
+	                morningDelivery.setTotalPrice(itemTotalPrice);
+                    morningDeliveryRepository.save(morningDelivery);
+                }
+            }
+
+           
+            System.out.println("Total Order Price: " + totalOrderPrice);
+        
 	    }
-
+}
 
 
     public List<BookingDetailsResponse> getAllBookingDetails() {
@@ -217,6 +235,7 @@ public class MorningDeliveryService {
             response.setMyAddress(morningDelivery.getUser().getMyAddress());
             response.setQuantity(morningDelivery.getQuantity());
             response.setStatus(morningDelivery.getStatus());
+            response.setTotalPrice(morningDelivery.getTotalPrice());
             response.setDeliveryDates(morningDelivery.getDeliveryDates());
             response.setOrderDateTime(morningDelivery.getOrderDateTime());
             setMorningDeliveryItemAndCategory(morningDelivery, response);
@@ -281,12 +300,28 @@ public class MorningDeliveryService {
 	        response.setMyAddress(morningDelivery.getUser().getMyAddress());
 	        response.setQuantity(morningDelivery.getQuantity());
 	        response.setStatus(morningDelivery.getStatus());
+	        response.setTotalPrice(morningDelivery.getTotalPrice());
 	        response.setOrderDateTime(morningDelivery.getOrderDateTime());
 	        response.setDeliveryDates(morningDelivery.getDeliveryDates());
 	        setMorningDeliveryItemAndCategory(morningDelivery, response);
 	        return response;
 	    }
 
+	    public String approveDelivery(Long id) {
+			MorningDelivery moring = morningDeliveryRepository.findById(id).get();
+			moring.setStatus(Status.orderplacedsuccessfully);
+			morningDeliveryRepository.save(moring);
+			return "Order placed successfully";
+	    }
+	    
+	    
+	    
+	    public String cancelledDelivery(Long id) {
+	    	MorningDelivery moring = morningDeliveryRepository.findById(id).get();
+			moring.setStatus(Status.Cancelled);
+			morningDeliveryRepository.save(moring);
+			return "Order cancelled";
+	    }
 
 
 	    
