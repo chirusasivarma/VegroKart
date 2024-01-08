@@ -1,6 +1,5 @@
 package com.example.VegroKart.InstantDelivery;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import com.example.VegroKart.Dto.Status;
@@ -107,6 +106,8 @@ public class InstantDelivery {
 	    private Status status;
 	    
 	    private LocalDateTime orderDateTime;
+	    
+	    private double totalPrice;
 
 
 }

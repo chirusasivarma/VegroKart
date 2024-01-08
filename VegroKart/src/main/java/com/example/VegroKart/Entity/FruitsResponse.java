@@ -12,5 +12,5 @@ public class FruitsResponse {
 	private String fruitName;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }

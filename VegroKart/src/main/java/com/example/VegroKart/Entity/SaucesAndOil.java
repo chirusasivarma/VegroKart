@@ -37,9 +37,9 @@ public class SaucesAndOil {
     @Positive(message = "Quantity must be a positive number")
     private String quantity;  
 
-    @NotNull(message = "Price cannot be empty")
-    @Positive(message = "Price cannot be empty")
-    private String price;  
+//    @NotNull(message = "Price cannot be empty")
+//    @Positive(message = "Price cannot be empty")
+    private Double price;  
 
     @Lob
     @JsonIgnore

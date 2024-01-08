@@ -12,7 +12,7 @@ public class BeveragesResponse {
 	private String beveragesName;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }
 
 

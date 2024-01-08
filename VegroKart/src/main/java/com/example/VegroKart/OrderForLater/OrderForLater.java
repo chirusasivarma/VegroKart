@@ -114,7 +114,7 @@ public class OrderForLater {
     @FutureOrPresent(message = "The requested delivery date and time must be in the present or future.")
     private LocalDateTime requestedDeliveryDateTime;
 	
-    
+    private double totalPrice;
     
 
 }

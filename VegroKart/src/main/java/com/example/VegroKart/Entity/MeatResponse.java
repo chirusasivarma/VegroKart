@@ -12,7 +12,7 @@ public class MeatResponse {
 	private String meatName;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }
 
 

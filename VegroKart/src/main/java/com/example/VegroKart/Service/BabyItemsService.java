@@ -30,7 +30,7 @@ public class BabyItemsService {
 	private BabyItemsRepository babyItemsRepository;
 
 	public BabyItems saveBabyItems(HttpServletRequest request, MultipartFile file, String name,
-			String quantity, String price)
+			String quantity, Double price)
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
 		Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
@@ -141,7 +141,7 @@ public class BabyItemsService {
 		return babyItemsResponses;
 	}
 	
-	public String updatebabyItems(long id, String name, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
+	public String updatebabyItems(long id, String name, String quantity, Double price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<BabyItems> optionalExistingBabyItems = babyItemsRepository.findById(id);
 

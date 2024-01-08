@@ -12,5 +12,5 @@ public class SnacksResponse {
 	private String snacksName;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }

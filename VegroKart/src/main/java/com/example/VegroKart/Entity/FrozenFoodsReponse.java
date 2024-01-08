@@ -12,6 +12,6 @@ public class FrozenFoodsReponse {
 	private String name;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }
 
