@@ -9,6 +9,7 @@ import javax.sql.rowset.serial.SerialException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Banner;
 import com.example.VegroKart.Entity.BannerResponse;
+import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.Service.BannerService;
 
@@ -81,6 +83,39 @@ public class BannerController {
         return ResponseEntity.ok(bannerbody); 
         
     }
+    @GetMapping("/displayImage")
+    @Transactional(readOnly = true)
+    public ResponseEntity<byte[]> displayBannerImage(@RequestParam("id") Integer id,
+                                                     @RequestParam("bannerNumber") int bannerNumber) throws SQLException {
+        Banner banner = bannerService.getImageViewById(id);
+        byte[] imageBytes;
 
+        if (banner != null) {
+            switch (bannerNumber) {
+            
+                case 1:
+                    imageBytes = banner.getBanner1().getBytes(1, (int) banner.getBanner1().length());
+                break;
+                case 2:
+                    imageBytes = banner.getBanner2().getBytes(1, (int) banner.getBanner2().length());
+                    break;
+                case 3:
+                    imageBytes = banner.getBanner3().getBytes(1, (int) banner.getBanner3().length());
+                    break;
+                case 4:
+                    imageBytes = banner.getBanner4().getBytes(1, (int) banner.getBanner4().length());
+                    break;
+                case 5:
+                    imageBytes = banner.getBanner5().getBytes(1, (int) banner.getBanner5().length());
+                    break;
+                default:
+             
+                    return ResponseEntity.badRequest().build();
+            }
 
+            return ResponseEntity.ok().contentType(org.springframework.http.MediaType.IMAGE_JPEG).body(imageBytes);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
