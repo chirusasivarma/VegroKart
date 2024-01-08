@@ -96,8 +96,7 @@ public class OderForLaterService {
 
         return orderForLaterRepository.findByUser(user);
     }
-
-    public void placeOrder(Long userId, List<OrderCategoryRequest> orderCategories) {
+    public void placeOrder(Long userId, List<OrderCategoryRequest> orderCategories, LocalDateTime requestedDeliveryDateTime) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserIsNotFoundException("Invalid user ID"));
 
@@ -108,18 +107,13 @@ public class OderForLaterService {
             for (OrderItemsRequest orderItem : items) {
                 Long entityId = orderItem.getItemId();
                 int quantity = orderItem.getQuantity();
-                
-                LocalDateTime requestedDeliveryDateTime = orderItem.getRequestedDeliveryDateTime();
 
-               
                 OrderForLater orderForLater = new OrderForLater();
                 orderForLater.setUser(user);
                 orderForLater.setQuantity(quantity);
                 orderForLater.setStatus(Status.Ontheway);
                 orderForLater.setOrderDateTime(LocalDateTime.now());
-                orderForLater.setRequestedDeliveryDateTime(requestedDeliveryDateTime);
-
-
+                orderForLater.setRequestedDeliveryDateTime(requestedDeliveryDateTime); // Set the requestedDeliveryDateTime here
 
                 switch (categoryName) {
                     case "Fruit":

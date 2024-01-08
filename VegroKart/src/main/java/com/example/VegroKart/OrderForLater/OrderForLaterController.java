@@ -1,5 +1,6 @@
 package com.example.VegroKart.OrderForLater;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,19 @@ public class OrderForLaterController {
 	public ResponseEntity<ResponseBody<?>> placeOrder(
 	        @PathVariable Long userId,
 	        @Valid @RequestBody OrderRequest orderRequest) {
-	    orderForLaterService.placeOrder(userId, orderRequest.getOrderCategories());
-	    // Your existing response logic
+	    
+	    LocalDateTime requestedDeliveryDateTime = orderRequest.getRequestedDeliveryDateTime(); // Assuming you have a method to get this from OrderRequest
+
+	    orderForLaterService.placeOrder(userId, orderRequest.getOrderCategories(), requestedDeliveryDateTime);
+	  
 	    ResponseBody<String> body = new ResponseBody<>();
 	    body.setStatusCode(HttpStatus.OK.value());
 	    body.setStatus("SUCCESS");
 	    body.setData("Order placed successfully");
 	    return new ResponseEntity<>(body, HttpStatus.OK);
 	}
+
+
 
 
     @GetMapping("/all")
