@@ -16,23 +16,29 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.VegroKart.Dto.BookingDetailsResponse;
 import com.example.VegroKart.Helper.ResponseBody;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/orderForLater")
+
 public class OrderForLaterController {
 	
 	@Autowired
     private OderForLaterService orderForLaterService;
 	
 	@PostMapping("/placeOrder/{userId}")
-    public ResponseEntity<ResponseBody<?>> placeOrder(@PathVariable Long userId,
-                                            @RequestBody List<OrderCategoryRequest> orderCategories) {
-        orderForLaterService.placeOrder(userId, orderCategories);
-        ResponseBody<String> body=new ResponseBody<String>();
-        body.setStatusCode(HttpStatus.OK.value());
-        body.setStatus("SUCCESS");
-        body.setData("Order placed successfully");
-        return new ResponseEntity<>(body,HttpStatus.OK); 
-    }
+	public ResponseEntity<ResponseBody<?>> placeOrder(
+	        @PathVariable Long userId,
+	        @Valid @RequestBody OrderRequest orderRequest) {
+	    orderForLaterService.placeOrder(userId, orderRequest.getOrderCategories());
+	    // Your existing response logic
+	    ResponseBody<String> body = new ResponseBody<>();
+	    body.setStatusCode(HttpStatus.OK.value());
+	    body.setStatus("SUCCESS");
+	    body.setData("Order placed successfully");
+	    return new ResponseEntity<>(body, HttpStatus.OK);
+	}
+
 
     @GetMapping("/all")
     public ResponseEntity<ResponseBody<List<OrderForLater>>> getAllOderForLater() {
