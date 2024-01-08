@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.VegroKart.Entity.Banner;
 import com.example.VegroKart.Entity.BannerResponse;
+import com.example.VegroKart.Entity.Fruits;
 import com.example.VegroKart.Exception.BannerNotFoundException;
+import com.example.VegroKart.Exception.FruitsIsNotFoundException;
 import com.example.VegroKart.Repository.BannerRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -169,6 +171,15 @@ public class BannerService {
 			    }
 
 			    return bannerResponse;
+			}
+			
+			public Banner getImageViewById(Integer id) {
+				Optional<Banner> optionalBanner = bannerRepository.findById(id);
+				if (optionalBanner.isEmpty()) {
+					throw new BannerNotFoundException("image is not uploaded...");
+				} else {
+					return optionalBanner.get();
+				}
 			}
 
 }
