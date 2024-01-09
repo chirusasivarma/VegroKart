@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,5 +60,37 @@ public class MorningDeliveryController {
 //	        List<BookingDetailsResponse> responses = morningDeliveryService.getMorningDeliveriesByUser(userId);
 //	        return new ResponseEntity<>(responses, HttpStatus.OK);
 //	    }
+	    
+	    @GetMapping("/getall")
+	    public ResponseEntity<ResponseBody<List<MorningDelivery>>> getAllMorningDeliveryDetail() {
+	        List<MorningDelivery> responses = morningDeliveryService.getAllMorningDeliveries();
+	        ResponseBody<List<MorningDelivery>> body=new ResponseBody<List<MorningDelivery>>();
+	    	body.setStatusCode(HttpStatus.OK.value());
+	    	body.setStatus("SUCCESS");
+	    	body.setData(responses);
+	    	return ResponseEntity.ok(body);
+	    }
+	    
+	    @PutMapping("/delivered/{id}")
+	    public ResponseEntity<ResponseBody<String>> approveDelivery(@PathVariable Long id) {
+	        String result = morningDeliveryService.approveDelivery(id);
+
+	        ResponseBody<String> body = new ResponseBody<>();
+	        body.setStatusCode(HttpStatus.OK.value());
+	        body.setStatus("SUCCESS");
+	        body.setData(result);
+	        return ResponseEntity.ok(body);
+	    }
+
+	    @PutMapping("/cancel/{id}")
+	    public ResponseEntity<ResponseBody<String>> rejectDelivery(@PathVariable Long id) {
+	    	String result = morningDeliveryService.approveDelivery(id);
+	        ResponseBody<String> body = new ResponseBody<>();
+	        body.setStatusCode(HttpStatus.OK.value());
+	        body.setStatus("SUCCESS");
+	        body.setData(result);
+	        return ResponseEntity.ok(body);
+	    }
+	    
 
 }

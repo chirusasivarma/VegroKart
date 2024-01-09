@@ -13,5 +13,5 @@ public class PetFoodResponse {
 	private String foodName;
 	private String quantity;
 	private String image;
-	private String price;
+	private Double price;
 }

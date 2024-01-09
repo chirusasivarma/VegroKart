@@ -102,7 +102,8 @@ public class OderForLaterService {
     public void placeOrder(Long userId, List<OrderCategoryRequest> orderCategories, LocalDateTime requestedDeliveryDateTime) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserIsNotFoundException("Invalid user ID"));
-
+        double totalOrderPrice = 0.0;
+        
         for (OrderCategoryRequest orderCategory : orderCategories) {
             String categoryName = orderCategory.getCategoryName();
             List<OrderItemsRequest> items = orderCategory.getItems();
@@ -114,85 +115,108 @@ public class OderForLaterService {
                 OrderForLater orderForLater = new OrderForLater();
                 orderForLater.setUser(user);
                 orderForLater.setQuantity(quantity);
+
                 orderForLater.setStatus(Status.PendingApproval);
+
                 orderForLater.setOrderDateTime(LocalDateTime.now());
+
                 orderForLater.setRequestedDeliveryDateTime(requestedDeliveryDateTime); // Set the requestedDeliveryDateTime here
 
+                orderForLater.setRequestedDeliveryDateTime(requestedDeliveryDateTime);
+                double itemTotalPrice = 0.0;
                 switch (categoryName) {
-                    case "Fruit":
-                        Fruits fruit = fruitRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Fruit ID"));
-                        orderForLater.setFruit(fruit);
-                        break;
-                    case "Snack":
-                        Snacks snack = snackRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Snack ID"));
-                        orderForLater.setSnack(snack);
-                        break;
-                    case "Vegetable":
-                        Vegetables vegetable = vegetableRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Vegetable ID"));
-                        orderForLater.setVegetable(vegetable);
-                        break;
-                    case "Meat":
-                        Meat meat = meatRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Meat ID"));
-                        orderForLater.setMeat(meat);
-                        break;
-                    case "Beverage":
-                        Beverages beverage = beverageRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Beverage ID"));
-                        orderForLater.setBeverage(beverage);
-                        break;
-                    case "DairyProduct":
-                        DairyProducts dairyProduct = dairyProductRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid DairyProduct ID"));
-                        orderForLater.setDairyProduct(dairyProduct);
-                        break;
-                    case "CannedGoods":
-                        CannedGoods cannedGoods = cannedGoodsRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid CannedGoods ID"));
-                        orderForLater.setCannedGood(cannedGoods);
-                        break;
-                    case "FrozenFoods":
-                        FrozenFoods frozenFoods = frozenFoodsRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid FrozenFoods ID"));
-                        orderForLater.setFrozenFood(frozenFoods);
-                        break;
-                    case "PersonalCare":
-                        PersonalCare personalCare = personalCareRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid PersonalCare ID"));
-                        orderForLater.setPersonalCare(personalCare);
-                        break;
-                    case "SaucesAndOil":
-                        SaucesAndOil saucesAndOil = saucesAndOilRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
-                        orderForLater.setSaucesAndOils(saucesAndOil);
-                        break;
-                    case "babyItem":
-                        BabyItems babyItem = babyItemsRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
-                        orderForLater.setBabyItem(babyItem);
-                        break;
-                    case "petFood":
-                        PetFood petFood = petFoodRepository.findById(entityId)
-                                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
-                        orderForLater.setPetFood(petFood);
-                        break;
-   
-                    
-                }
+                case "Fruit":
+                    Fruits fruit = fruitRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Fruit ID"));
+                    orderForLater.setFruit(fruit);
+                    itemTotalPrice = fruit.getPrice() * quantity;
+                    break;
+                case "Snack":
+                    Snacks snack = snackRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Snack ID"));
+                    orderForLater.setSnack(snack);
+                    itemTotalPrice = snack.getPrice() * quantity;
+                    break;
+                case "Vegetable":
+                    Vegetables vegetable = vegetableRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Vegetable ID"));
+                    orderForLater.setVegetable(vegetable);
+                    itemTotalPrice =vegetable.getPrice() * quantity;
+                    break;
 
-                orderForLaterRepository.save(orderForLater);
+                case "Meat":
+                    Meat meat = meatRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Meat ID"));
+                    orderForLater.setMeat(meat);
+                    itemTotalPrice = meat.getPrice() * quantity;
+                    break;
+                case "Beverage":
+                    Beverages beverage = beverageRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid Beverage ID"));
+                    orderForLater.setBeverage(beverage);
+                    itemTotalPrice = beverage.getPrice() * quantity;
+                    break;
+                case "DairyProduct":
+                    DairyProducts dairyProduct = dairyProductRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid DairyProduct ID"));
+                    orderForLater.setDairyProduct(dairyProduct);
+                    orderForLater.setTotalPrice(dairyProduct.getPrice() * quantity);
+                    break;
+                case "CannedGoods":
+                    CannedGoods cannedGoods = cannedGoodsRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid CannedGoods ID"));
+                    orderForLater.setCannedGood(cannedGoods);
+                    orderForLater.setTotalPrice(cannedGoods.getPrice() * quantity);
+                    break;
+                case "FrozenFoods":
+                    FrozenFoods frozenFoods = frozenFoodsRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid FrozenFoods ID"));
+                    orderForLater.setFrozenFood(frozenFoods);
+                    orderForLater.setTotalPrice(frozenFoods.getPrice() * quantity);
+                    break;
+                case "PersonalCare":
+                    PersonalCare personalCare = personalCareRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid PersonalCare ID"));
+                    orderForLater.setPersonalCare(personalCare);
+                    orderForLater.setTotalPrice(personalCare.getPrice() * quantity);
+                    break;
+                case "SaucesAndOil":
+                    SaucesAndOil saucesAndOil = saucesAndOilRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid SaucesAndOil ID"));
+                    orderForLater.setSaucesAndOils(saucesAndOil);
+                    orderForLater.setTotalPrice(saucesAndOil.getPrice() * quantity);
+                    break;
+                case "babyItem":
+                    BabyItems babyItem = babyItemsRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid babyitems ID"));
+                    orderForLater.setBabyItem(babyItem);
+                    orderForLater.setTotalPrice(babyItem.getPrice() * quantity);
+                    break;
+                case "petFood":
+                    PetFood petFood = petFoodRepository.findById(entityId)
+                            .orElseThrow(() -> new ProductsIsNotFoundException("Invalid petFood ID"));
+                    orderForLater.setPetFood(petFood);
+                    orderForLater.setTotalPrice(petFood.getPrice() * quantity);
+                    break;
             }
-        }
-    }
+                    totalOrderPrice += itemTotalPrice; 
+
+                    orderForLater.setTotalPrice(itemTotalPrice);
+                    orderForLaterRepository.save(orderForLater);
+                }
+            }
+
+           
+            System.out.println("Total Order Price: " + totalOrderPrice);
+        
+
+}
     
     
     
     public String approveorderForLater(Long id) {
 		OrderForLater orderForLater = orderForLaterRepository.findById(id).get();
-		orderForLater.setStatus(Status.Delivered);
+		orderForLater.setStatus(Status.orderplacedsuccessfully);
 		orderForLaterRepository.save(orderForLater);
 		return "Order Deliverd";
     }
@@ -218,6 +242,7 @@ public class OderForLaterService {
         response.setMyAddress(orderForLater.getUser().getMyAddress());
         response.setQuantity(orderForLater.getQuantity());
         response.setStatus(orderForLater.getStatus());
+        response.setTotalPrice(orderForLater.getTotalPrice());
         response.setOrderDateTime(orderForLater.getOrderDateTime());
 
         setBookedItemAndCategory(orderForLater, response);
@@ -279,6 +304,7 @@ public class OderForLaterService {
             response.setMyAddress(orderForLater.getUser().getMyAddress());
             response.setQuantity(orderForLater.getQuantity());
             response.setStatus(orderForLater.getStatus());
+            response.setTotalPrice(orderForLater.getTotalPrice());
             response.setOrderDateTime(orderForLater.getOrderDateTime());
 
             setBookedItemAndCategory(orderForLater, response);
@@ -308,8 +334,8 @@ public class OderForLaterService {
             response.setMyAddress(orderForLater.getUser().getMyAddress());
             response.setQuantity(orderForLater.getQuantity());
             response.setStatus(orderForLater.getStatus());
+            response.setTotalPrice(orderForLater.getTotalPrice());
             response.setOrderDateTime(orderForLater.getOrderDateTime());
-            response.setRequestedDeliveryDateTime(orderForLater.getRequestedDeliveryDateTime());
             
 
             setBookedItemAndCategory(orderForLater, response);
@@ -319,8 +345,7 @@ public class OderForLaterService {
 
         return responses;
     }
-    
-    
+  
     public ResponseEntity<ResponseBody<?>> respondToOrder(Long orderId, boolean accept) {
         OrderForLater order = orderForLaterRepository.findById(orderId)
                 .orElseThrow(() -> new ProductsIsNotFoundException("Invalid order ID"));

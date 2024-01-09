@@ -42,7 +42,7 @@ public class SnacksController {
 	        @RequestParam("file") @Valid MultipartFile file,
 	        @RequestParam("snacksName") String snacksName,
 	        @RequestParam("quantity") String quantity,
-	        @RequestParam("price") String price,
+	        @RequestParam("price") Double price,
 	        HttpServletRequest request) throws IOException, SerialException, SQLException {
 
 	    if (file == null || file.isEmpty()) {
@@ -133,7 +133,7 @@ public class SnacksController {
 	public ResponseEntity<ResponseBody<String>> updateSnacks(
 
 			@PathVariable("id") long id, @RequestParam("file") MultipartFile file, @RequestParam("snacksName") String snacksName,
-			@RequestParam("quantity") String quantity, @RequestParam("price") String price) throws IOException, SerialException, SQLException {
+			@RequestParam("quantity") String quantity, @RequestParam("price") Double price) throws IOException, SerialException, SQLException {
 		String message = snacksService.updatesnacks(id, snacksName, quantity, price,file);
 
 		ResponseBody<String> responseBody = new ResponseBody<>();

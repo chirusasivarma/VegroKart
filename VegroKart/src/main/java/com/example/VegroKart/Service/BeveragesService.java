@@ -27,7 +27,7 @@ public class BeveragesService {
 	@Autowired
 	private BeveragesRepository beveragesRepository;
 
-	public Beverages saveBeverages(HttpServletRequest request, MultipartFile file, String beveragesName,String quantity, String price)
+	public Beverages saveBeverages(HttpServletRequest request, MultipartFile file, String beveragesName,String quantity, Double price)
 			
 			throws IOException, SerialException, SQLException {
 		byte[] bytes = file.getBytes();
@@ -137,7 +137,7 @@ public class BeveragesService {
 		});
 		return beveragesResponses;
 	}
-public String updatebeverages(long id, String beveragesName, String quantity, String price, MultipartFile file) throws IOException, SerialException, SQLException {
+public String updatebeverages(long id, String beveragesName, String quantity, Double price, MultipartFile file) throws IOException, SerialException, SQLException {
 		
 		Optional<Beverages> optionalExistingBeverages = beveragesRepository.findById(id);
 

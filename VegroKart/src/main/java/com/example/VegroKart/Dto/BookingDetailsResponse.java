@@ -24,6 +24,7 @@ public class BookingDetailsResponse {
     private Object bookedItem;
     private String category;
     private int quantity;
+    private double totalPrice;
     private Status status;
     private List<LocalDate> deliveryDates;
 	private LocalDateTime orderDateTime;
