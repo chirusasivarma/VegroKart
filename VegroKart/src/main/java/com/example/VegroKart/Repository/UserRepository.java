@@ -20,5 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	
 	@Query("SELECT u FROM User u LEFT JOIN FETCH u.instantDelivery WHERE u.id = :userId")
     Optional<User> findByIdWithInstantDelivery(@Param("userId") Long userId);
+
+	Optional<User> findById(User user2);
 	
 }

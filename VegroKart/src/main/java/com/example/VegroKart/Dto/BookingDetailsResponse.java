@@ -28,6 +28,8 @@ public class BookingDetailsResponse {
     private Status status;
     private List<LocalDate> deliveryDates;
 	private LocalDateTime orderDateTime;
+	private LocalDateTime requestedDeliveryDateTime;
+	
 	
 		
 }
