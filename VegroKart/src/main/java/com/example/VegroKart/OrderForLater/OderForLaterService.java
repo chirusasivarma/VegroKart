@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.VegroKart.Dto.BookingDetailsResponse;
@@ -25,6 +27,7 @@ import com.example.VegroKart.Entity.User;
 import com.example.VegroKart.Entity.Vegetables;
 import com.example.VegroKart.Exception.ProductsIsNotFoundException;
 import com.example.VegroKart.Exception.UserIsNotFoundException;
+import com.example.VegroKart.Helper.ResponseBody;
 import com.example.VegroKart.OrderForLater.OrderForLater;
 import com.example.VegroKart.OrderForLater.OrderForLaterRepository;
 
@@ -111,7 +114,7 @@ public class OderForLaterService {
                 OrderForLater orderForLater = new OrderForLater();
                 orderForLater.setUser(user);
                 orderForLater.setQuantity(quantity);
-                orderForLater.setStatus(Status.Ontheway);
+                orderForLater.setStatus(Status.PendingApproval);
                 orderForLater.setOrderDateTime(LocalDateTime.now());
                 orderForLater.setRequestedDeliveryDateTime(requestedDeliveryDateTime); // Set the requestedDeliveryDateTime here
 
@@ -306,6 +309,7 @@ public class OderForLaterService {
             response.setQuantity(orderForLater.getQuantity());
             response.setStatus(orderForLater.getStatus());
             response.setOrderDateTime(orderForLater.getOrderDateTime());
+            response.setRequestedDeliveryDateTime(orderForLater.getRequestedDeliveryDateTime());
             
 
             setBookedItemAndCategory(orderForLater, response);
@@ -315,6 +319,47 @@ public class OderForLaterService {
 
         return responses;
     }
+    
+    
+    public ResponseEntity<ResponseBody<?>> respondToOrder(Long orderId, boolean accept) {
+        OrderForLater order = orderForLaterRepository.findById(orderId)
+                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid order ID"));
+
+        if (accept) {
+            order.setStatus(Status.Ontheway);
+        } else {
+            order.setStatus(Status.Cancelled);
+        }
+
+        orderForLaterRepository.save(order);
+
+        ResponseBody<String> body = new ResponseBody<>();
+        body.setStatusCode(HttpStatus.OK.value());
+        body.setStatus("SUCCESS");
+        body.setData("Order response processed successfully");
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+    
+    public ResponseEntity<ResponseBody<?>> respondToOrder2(Long orderId, boolean reject) {
+        OrderForLater order = orderForLaterRepository.findById(orderId)
+                .orElseThrow(() -> new ProductsIsNotFoundException("Invalid order ID"));
+
+        if (reject) {
+            order.setStatus(Status.Ontheway);
+        } else {
+            order.setStatus(Status.Cancelled);
+        }
+
+        orderForLaterRepository.save(order);
+
+        ResponseBody<String> body = new ResponseBody<>();
+        body.setStatusCode(HttpStatus.OK.value());
+        body.setStatus("SUCCESS");
+        body.setData("Order response processed successfully");
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
+
 
 
 

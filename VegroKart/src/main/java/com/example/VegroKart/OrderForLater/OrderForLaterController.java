@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.VegroKart.Dto.BookingDetailsResponse;
@@ -32,7 +33,7 @@ public class OrderForLaterController {
 	        @PathVariable Long userId,
 	        @Valid @RequestBody OrderRequest orderRequest) {
 	    
-	    LocalDateTime requestedDeliveryDateTime = orderRequest.getRequestedDeliveryDateTime(); // Assuming you have a method to get this from OrderRequest
+	    LocalDateTime requestedDeliveryDateTime = orderRequest.getRequestedDeliveryDateTime();
 
 	    orderForLaterService.placeOrder(userId, orderRequest.getOrderCategories(), requestedDeliveryDateTime);
 	  
@@ -105,6 +106,21 @@ public class OrderForLaterController {
         body.setStatus("SUCCESS");
         body.setData(bookingDetailsList);
         return ResponseEntity.status(HttpStatus.OK).body(body);
+    }
+    
+    //ADMIN
+    @PostMapping("/respondToOrder/{orderId}")
+    public ResponseEntity<ResponseBody<?>> respondToOrder(
+            @PathVariable Long orderId,
+            @RequestParam boolean accept) {
+        return orderForLaterService.respondToOrder(orderId, accept);
+    }
+
+    @PostMapping("/respondToOrder2/{orderId}")
+    public ResponseEntity<ResponseBody<?>> respondToOrder2(
+            @PathVariable Long orderId,
+            @RequestParam boolean reject) {
+        return orderForLaterService.respondToOrder(orderId, reject);
     }
 
  

@@ -1,6 +1,7 @@
 package com.example.VegroKart.Dto;
 
 import java.sql.Blob;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.VegroKart.Entity.MyAddress;
@@ -51,6 +52,8 @@ public class UserDto {
 	    private List<MorningDelivery> morningDeliveries; 
 
 	    private List<OrderForLater> orderForLater;
+	    
+	    private LocalDateTime requestedDeliveryDateTime;
 
 		
 			
